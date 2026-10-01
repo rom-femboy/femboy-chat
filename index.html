@@ -150,6 +150,7 @@ let mr,ch,tm;$('mic').onclick=async()=>{if(mr&&mr.state==='recording')return mr.
 // --- tabs & auth ---
 const tab=n=>[['chat','tChat'],['prof','tProf'],['adm','tAdm']].forEach(([k,b])=>{$(k).hidden=n!==k;$(b).classList.toggle('on',n===k)});
 $('tChat').onclick=()=>tab('chat');$('tProf').onclick=()=>tab('prof');
+const DBID='default'; // имя базы Firestore (в консоли: Firestore → поле рядом с названием; для основной базы поставьте '(default)')
 const OWNER="212b99b4e8f59d297419d25893198e20b80ac3bc0ad61c3c4cb28d6346025431",ADMINS=["0db9def0a9c2eecaf69a75c4a978ca192b8971d879b2f78dcb03159d70a1d597", "34c1ab3889df5c9b1b90a3558be30fe891394dbd0f9909b1f209f25c814e5bce", "7dc048737291c70113de6cd74eb7646f867e7ad22902bd768fe6ce16c5a84428", "7d9c7dbe05a017331c63010e680d7e1407f5107de1370176c85b0894bf230df3", "362c567767cff1fe42375a8b216557aef87ceb85450c5d4417a40260ee7c1aa1", "e7d8360683ffca52c8039278c46648efa82f18336c42089f8d8ff9a578e39889", "a56cda48b11adb57fbfa77bf5e8cb502ababaa17e9b2dec6ad70a2883e2c2031"];
 const badge=a=>a===OWNER?'👑 ':ADMINS.includes(a)?'🛡 ':'';
 const AB='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -193,11 +194,11 @@ async function start(a,nm){
   onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E))}
  tab('chat')}
 newCode();
-try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true,useFetchStreams:false});
+try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true},DBID);
  $('diag').onclick=async()=>{$('err').textContent='…';const o=['проект: '+firebaseConfig.projectId,'вход: '+(fu?'ok':'нет')];
   try{await Promise.race([getDoc(doc(db,'sessions',fu.uid)),new Promise((_,r)=>setTimeout(()=>r({code:'timeout 10с'}),10000))]);o.push('база: ok')}catch(e){o.push('база: '+(e.code||'')+' '+(e.message||''))}
   try{await fetch('https://firestore.googleapis.com/',{mode:'no-cors'});o.push('сеть до базы: ok')}catch(e){o.push('сеть до базы: заблокирована')}
-  try{const tk=await fu.getIdToken(),r=await fetch('https://firestore.googleapis.com/v1/projects/'+firebaseConfig.projectId+'/databases/(default)/documents/sessions/'+fu.uid,{headers:{Authorization:'Bearer '+tk}}),j=await r.json().catch(()=>({}));o.push('REST '+r.status+': '+((j.error&&j.error.message)||'ok').slice(0,200))}catch(e){o.push('REST: '+e.message)}
+  try{const tk=await fu.getIdToken(),r=await fetch('https://firestore.googleapis.com/v1/projects/'+firebaseConfig.projectId+'/databases/'+DBID+'/documents/sessions/'+fu.uid,{headers:{Authorization:'Bearer '+tk}}),j=await r.json().catch(()=>({}));o.push('REST '+r.status+': '+((j.error&&j.error.message)||'ok').slice(0,200))}catch(e){o.push('REST: '+e.message)}
   $('err').textContent=o.join(' | ')};
  $('out').onclick=logout;$('tAdm').onclick=()=>tab('adm');
  $('gbtn').onclick=async()=>{const c=$('code').value.trim(),n=$('lname').value,p=$('lpass').value;$('err').textContent='';
