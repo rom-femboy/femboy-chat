@@ -51,10 +51,14 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
 .rx{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.chip{padding:2px 8px;font-size:13px;border-radius:12px;border:1px solid var(--bd);background:var(--pan)}.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .m img{cursor:zoom-in}.av.sm{width:24px;height:24px;font-size:12px}.ri{display:flex;align-items:center;gap:6px}
 #ep{position:fixed;display:flex;gap:2px;padding:6px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;box-shadow:0 4px 16px #0004;z-index:50}#ep button{font-size:20px;padding:4px 6px}
+#ttl{text-align:center;font-weight:700;font-size:20px;padding:10px 8px 0}
+#rtools{flex-wrap:wrap}.rrow{display:flex;gap:2px}.rrow .ri{flex:1;min-width:0}.ri span:not(.bd){overflow:hidden;text-overflow:ellipsis}.mv{padding:4px 6px;font-size:11px}
+.bd{background:#e5484d;color:#fff;border-radius:10px;padding:0 6px;font-size:12px;margin-left:auto}
 </style></head><body>
 <div id="app">
+ <div id="ttl">🏳️‍⚧️ Фембойский чатик 🏳️‍⚧️</div>
  <nav>
-  <b>💬 Фембойский чатик</b>
+  
   <button class="tab on" id="tChat" hidden></button><button class="tab" id="tProf" hidden></button><button class="tab" id="tAdm" hidden>🛡</button>
   <span class="sp"></span>
   <select id="lang"></select>
@@ -67,7 +71,7 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
  <p><input type="text" id="lname" autocomplete="username"></p><p><input type="password" id="lpass" autocomplete="current-password"></p>
  <button class="pri" id="gbtn"></button> <button id="diag">Проверка связи</button><p id="err" style="color:#e5484d"></p></div>
  <div id="chat" hidden>
-  <div id="rbar"><div id="rtools"><button id="rnew">＋</button><button id="rch">📢</button><button id="rset">⚙</button></div><div id="rlist"></div></div>
+  <div id="rbar"><div id="rtools"><button id="rnew">＋</button><button id="rch">📢</button><button id="rsr">🔍</button><button id="rord">⇅</button><button id="rset">⚙</button></div><div id="rlist"></div></div>
   <div id="cmain"><div id="chead"></div>
   <div id="msgs"></div>
   <div id="bar"><button id="att">📎</button><input type="file" id="file" accept="image/*" hidden>
@@ -85,6 +89,7 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
   </div>
   <div class="card"><h3 data-i="theme"></h3><div id="rgb"></div></div>
   <div class="card"><h3 data-i="iface"></h3><p data-i="listpos"></p><select id="lay"><option value="l"></option><option value="r"></option><option value="t"></option></select></div>
+  <div class="card" id="credcard"><h3 data-i="secur"></h3><button id="credbtn" data-i="chcred"></button></div>
   <div class="card"><h3 data-i="gallery"></h3><div class="gal" id="gedit"></div><input type="file" id="gf" accept="image/*" hidden></div>
  </div>
 </div>
@@ -113,6 +118,8 @@ Object.assign(T.en,{gl:"Global chat",k_dm:"Private chat",k_group:"Group",k_chann
 Object.assign(T.ru,{iface:"Интерфейс",listpos:"Расположение списка чатов",p_l:"Слева",p_r:"Справа",p_t:"Сверху"});
 Object.assign(T.en,{iface:"Interface",listpos:"Chat list position",p_l:"Left",p_r:"Right",p_t:"Top"});
 Object.assign(T.ru,{delmsg:"Удалить сообщение"});Object.assign(T.en,{delmsg:"Delete message"});
+Object.assign(T.ru,{people:"Поиск людей",secur:"Безопасность",chcred:"Сменить логин и пароль",curc:"Ваш код (32 символа)",curn:"Текущее имя для входа",curp:"Текущий пароль",newn:"Новое имя для входа",newp:"Новый пароль",need3:"Заполните все поля",wrongc:"Код, имя или пароль не подходят",csaved:"Сохранено ✓"});
+Object.assign(T.en,{people:"Find people",secur:"Security",chcred:"Change login and password",curc:"Your code (32 chars)",curn:"Current login name",curp:"Current password",newn:"New login name",newp:"New password",need3:"Fill in all fields",wrongc:"Code, name or password is wrong",csaved:"Saved ✓"});
 const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
 let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
 if(!T[L])L='en';
@@ -177,7 +184,7 @@ let mr,ch,tm;$('mic').onclick=async()=>{if(mr&&mr.state==='recording')return mr.
    const f=new FileReader();f.onload=()=>f.result.length<700000?post({kind:'audio',src:f.result}):alert('Too long');f.readAsDataURL(new Blob(ch,{type:mr.mimeType}))};
   mr.start();$('mic').textContent='⏹';$('mic').classList.add('rec');tm=setTimeout(()=>mr.state==='recording'&&mr.stop(),45000)}catch(e){alert('Mic: '+e.name)}};
 // --- tabs & auth ---
-const tab=n=>[['chat','tChat'],['prof','tProf'],['adm','tAdm']].forEach(([k,b])=>{$(k).hidden=n!==k;$(b).classList.toggle('on',n===k)});
+const tab=n=>{[['chat','tChat'],['prof','tProf'],['adm','tAdm']].forEach(([k,b])=>{$(k).hidden=n!==k;$(b).classList.toggle('on',n===k)});if(n==='chat'&&msgs.length)markRead(cur.id,msgs[msgs.length-1].ts)};
 $('tChat').onclick=()=>tab('chat');$('tProf').onclick=()=>tab('prof');
 const DBID='default'; // имя базы Firestore (в консоли: Firestore → поле рядом с названием; для основной базы поставьте '(default)')
 const OWNER="212b99b4e8f59d297419d25893198e20b80ac3bc0ad61c3c4cb28d6346025431",ADMINS=["0db9def0a9c2eecaf69a75c4a978ca192b8971d879b2f78dcb03159d70a1d597", "34c1ab3889df5c9b1b90a3558be30fe891394dbd0f9909b1f209f25c814e5bce", "7dc048737291c70113de6cd74eb7646f867e7ad22902bd768fe6ce16c5a84428", "7d9c7dbe05a017331c63010e680d7e1407f5107de1370176c85b0894bf230df3", "362c567767cff1fe42375a8b216557aef87ceb85450c5d4417a40260ee7c1aa1", "e7d8360683ffca52c8039278c46648efa82f18336c42089f8d8ff9a578e39889", "a56cda48b11adb57fbfa77bf5e8cb502ababaa17e9b2dec6ad70a2883e2c2031"];
@@ -191,7 +198,7 @@ const newCode=()=>{$('code').value=localStorage.nc||(localStorage.nc=gen(32))};
 $('regen').onclick=()=>{localStorage.removeItem('nc');newCode()};
 $('cp').onclick=async()=>{try{await navigator.clipboard.writeText($('code').value)}catch(e){$('code').select();document.execCommand('copy')}$('cp').textContent=t('copied');setTimeout(()=>$('cp').textContent=t('copy'),1500)};
 function showLogin(){$('login').hidden=false;['tChat','tProf','tAdm','out','chat','prof','adm'].forEach(i=>$(i).hidden=true);applyTheme();newCode()}
-async function logout(){subs.forEach(f=>f());subs=[];if(msgSub){msgSub();msgSub=null}if(rxSub){rxSub();rxSub=null}cur={id:'global',type:'global'};myRooms=[];G=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
+async function logout(){subs.forEach(f=>f());subs=[];if(msgSub){msgSub();msgSub=null}if(rxSub){rxSub();rxSub=null}Object.values(usubs).forEach(f=>f());usubs={};un={};cur={id:'global',type:'global'};myRooms=[];G=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
 const mute=id=>{const m=+prompt(t('mins'),'10');return m>0?setDoc(doc(db,'mutes',id),{until:Date.now()+m*60000}):Promise.resolve()};
 function buildAdm(){const b=$('adm');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="ac" style="font-family:monospace"></p><p><input type="text" id="an"></p><p><input type="text" id="ap"></p><button class="pri" id="aadd"></button> <span id="ares"></span></div><div class="card"><div id="alist"></div></div>';
  b.querySelector('h3').textContent=t('adduser');$('ac').placeholder=t('code');$('an').placeholder=t('name');$('ap').placeholder=t('pass');$('aadd').textContent=t('add');
@@ -206,15 +213,27 @@ function renderAdm(){const l=$('alist');if(!l||role==='user')return;l.innerHTML=
   B(bl.has(r.id)?'unblock':'block',()=>bl.has(r.id)?deleteDoc(doc(db,'blocked',r.id)):setDoc(doc(db,'blocked',r.id),{ts:Date.now(),by:acc}));
   if(r.u)B('del',()=>confirm(t('del')+'?')?deleteDoc(doc(db,'accounts',r.id)):Promise.resolve());
   l.append(d)})}
-let rx={},rxSub=null,cur={id:'global',type:'global'},myRooms=[],chans=[],msgSub=null,G=[];
+let un={},usubs={},edit=false,rx={},rxSub=null,cur={id:'global',type:'global'},myRooms=[],chans=[],msgSub=null,G=[];
 function denied(e){if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))}
 const mcol=r=>r.id==='global'?collection(db,'messages'):collection(db,'rooms',r.id,'msgs');
-const rname=r=>r.id==='global'?'🌍 '+t('gl'):r.type==='dm'?'👤 '+((users[(r.members||[]).find(x=>x!==acc)]||{}).name||'?'):(r.type==='channel'?'📢 ':'👥 ')+r.name;
-function renderRooms(){const l=$('rlist');l.innerHTML='';[{id:'global',type:'global'},...[...myRooms].sort((a,b)=>b.ts-a.ts)].forEach(r=>{const b=document.createElement('button');b.className='ri'+(r.id===cur.id?' on':'');b.textContent=rname(r);if(r.type==='dm'){const a=avatar(users[(r.members||[]).find(x=>x!==acc)]||{});a.classList.add('sm');b.prepend(a)}b.onclick=()=>subRoom(r);l.append(b)});renderHead()}
+const rname=r=>r.id==='global'?'🌍 '+t('gl'):r.type==='dm'?((users[(r.members||[]).find(x=>x!==acc)]||{}).name||'?'):(r.type==='channel'?'📢 ':'👥 ')+r.name;
+const ordKey=()=>'ord_'+acc;
+function sorted(){const all=[{id:'global',type:'global'},...myRooms],o=JSON.parse(localStorage[ordKey()]||'[]');
+ return all.sort((a,b)=>{const i=o.indexOf(a.id),j=o.indexOf(b.id);if(i<0&&j<0)return a.id==='global'?-1:b.id==='global'?1:(b.ts||0)-(a.ts||0);return(i<0?1e9:i)-(j<0?1e9:j)})}
+function move(id,d){const l=sorted().map(r=>r.id),i=l.indexOf(id),j=i+d;if(j<0||j>=l.length)return;[l[i],l[j]]=[l[j],l[i]];localStorage[ordKey()]=JSON.stringify(l);renderRooms()}
+function renderRooms(){const l=$('rlist');l.innerHTML='';let tot=0;
+ sorted().forEach(r=>{tot+=un[r.id]||0;const row=document.createElement('div');row.className='rrow';const b=document.createElement('button');b.className='ri'+(r.id===cur.id?' on':'');
+  if(r.type==='dm'){const a=avatar(users[(r.members||[]).find(x=>x!==acc)]||{});a.classList.add('sm');b.append(a)}
+  const nm=document.createElement('span');nm.textContent=rname(r);b.append(nm);
+  if(un[r.id]){const k=document.createElement('span');k.className='bd';k.textContent=un[r.id]>=50?'50+':un[r.id];b.append(k)}
+  b.onclick=()=>subRoom(r);row.append(b);
+  if(edit)[['▲',-1],['▼',1]].forEach(([c,d])=>{const x=document.createElement('button');x.textContent=c;x.className='mv';x.onclick=()=>move(r.id,d);row.append(x)});
+  l.append(row)});
+ $('tChat').textContent=t('chat')+(tot?' ('+tot+')':'');renderHead()}
 const applyLay=()=>{const v=localStorage.lay||(innerWidth<700?'t':'l');$('chat').classList.remove('l','r','t');$('chat').classList.add(v);$('lay').value=v};
 $('lay').onchange=e=>{localStorage.lay=e.target.value;applyLay()};applyLay();
 function subRoom(r){cur=r;if(msgSub)msgSub();if(rxSub)rxSub();rx={};msgs=[];draw();$('bar').hidden=r.type==='channel'&&r.owner!==acc;renderRooms();
- msgSub=onSnapshot(query(mcol(r),orderBy('ts','desc'),limit(100)),s=>{msgs=s.docs.map(d=>({...d.data(),id:d.id})).reverse();draw()},e=>{if(r.id!=='global')subRoom({id:'global',type:'global'});else denied(e)});
+ msgSub=onSnapshot(query(mcol(r),orderBy('ts','desc'),limit(100)),s=>{msgs=s.docs.map(d=>({...d.data(),id:d.id})).reverse();draw();if(msgs.length&&!$('chat').hidden)markRead(r.id,msgs[msgs.length-1].ts)},e=>{if(r.id!=='global')subRoom({id:'global',type:'global'});else denied(e)});
  rxSub=onSnapshot(query(collection(db,'reacts'),where('room','==',r.id)),s=>{rx={};s.docs.forEach(d=>{const x=d.data();(rx[x.msg]=rx[x.msg]||{})[x.uid]=x.e});draw()},()=>{})}
 $('rset').onclick=async()=>{if(cur.id==='global'||cur.type==='dm')return;const own=cur.owner===acc;
  try{if(own){if(confirm(t('delroom')+'?'))await deleteDoc(doc(db,'rooms',cur.id))}else if(confirm(t('leave')+'?'))await updateDoc(doc(db,'rooms',cur.id),{members:arrayRemove(acc)})}catch(e){alert(e.code)}};
@@ -271,17 +290,36 @@ function extras(m){const w=document.createElement('div');w.className='rx';const 
  const add=document.createElement('button');add.className='chip';add.textContent='☺+';add.onclick=ev=>pick(ev,m);w.append(add);
  if(m.uid===acc||role!=='user'){const x=document.createElement('button');x.className='chip';x.textContent='🗑';x.onclick=()=>{if(confirm(t('delmsg')+'?'))deleteDoc(doc(mcol(cur),m.id)).catch(e=>alert(e.code))};w.append(x)}
  return w}
+const lrk=id=>'rd_'+acc+'_'+id,lr=id=>+(localStorage[lrk(id)]||0);
+function markRead(id,ts){if(ts>lr(id))localStorage[lrk(id)]=ts;if(un[id]){un[id]=0;renderRooms()}}
+function watch(){const rooms=[{id:'global'},...myRooms],want=rooms.map(r=>r.id);
+ Object.keys(usubs).forEach(id=>{if(!want.includes(id)){usubs[id]();delete usubs[id];delete un[id]}});
+ rooms.forEach(r=>{const id=r.id;if(usubs[id])return;if(!localStorage[lrk(id)])localStorage[lrk(id)]=id==='global'?Date.now():(r.ts||Date.now());
+  usubs[id]=onSnapshot(query(mcol({id}),orderBy('ts','desc'),limit(50)),s=>{const L=lr(id),ms=s.docs.map(d=>d.data()),vis=id===cur.id&&!$('chat').hidden;
+   if(vis&&ms[0])localStorage[lrk(id)]=Math.max(L,ms[0].ts);un[id]=vis?0:ms.filter(m=>m.ts>L&&m.uid!==acc).length;renderRooms()},()=>{})});renderRooms()}
+$('rord').onclick=()=>{edit=!edit;renderRooms()};
+$('rsr').onclick=()=>{const d=$('dlg');d.innerHTML='<h3></h3><p><input type="text" id="sq"></p><div id="sl" style="max-height:300px;overflow:auto"></div><p><button id="sx"></button></p>';
+ d.querySelector('h3').textContent=t('people');$('sq').placeholder=t('search');$('sx').textContent=t('close');$('sx').onclick=()=>d.close();
+ const go=()=>{const l=$('sl');l.innerHTML='';const q=$('sq').value.trim().toLowerCase();
+  Object.entries(users).filter(([id,u])=>id!==acc&&(u.name||'').toLowerCase().includes(q)).slice(0,50).forEach(([id,u])=>{const row=document.createElement('div'),n=document.createElement('span');row.className='hit';row.style.cursor='pointer';n.textContent=badge(id)+(u.name||'?');row.append(avatar(u),n);row.onclick=()=>{d.close();openProf(id)};l.append(row)})};
+ $('sq').oninput=go;go();d.showModal()};
+$('credbtn').onclick=()=>{const d=$('dlg');d.innerHTML='<h3></h3><p><input type="text" id="cc" style="font-family:monospace"></p><p><input type="text" id="co"></p><p><input type="password" id="cp0"></p><p><input type="text" id="cn"></p><p><input type="password" id="cp1"></p><p><button class="pri" id="cok"></button> <button id="cx3"></button> <span id="cres"></span></p>';
+ d.querySelector('h3').textContent=t('chcred');[['cc','curc'],['co','curn'],['cp0','curp'],['cn','newn'],['cp1','newp']].forEach(([i,k])=>$(i).placeholder=t(k));$('cok').textContent=t('save');$('cx3').textContent=t('close');$('cx3').onclick=()=>d.close();
+ $('cok').onclick=async()=>{const c=$('cc').value.trim(),o=$('co').value,p0=$('cp0').value,n=$('cn').value.trim(),p1=$('cp1').value,res=m=>$('cres').textContent=m;
+  if(c.length!==32||!o||!p0||!n||!p1)return res(t('need3'));
+  try{if(await ids(c)!==acc)return res(t('wrongc'));const ss=await getDoc(doc(db,'sessions',fu.uid));if(!ss.exists()||ss.data().proof!==await prf(c,o,p0))return res(t('wrongc'));
+   const np=await prf(c,n,p1);await updateDoc(doc(db,'accounts',acc),{proof:np,name:n});await setDoc(doc(db,'sessions',fu.uid),{acc,proof:np});localStorage.nm=n;res(t('csaved'))}catch(e){res(e.code||e.message)}};d.showModal()};
 async function start(a,nm){
  try{if((await getDoc(doc(db,'blocked',a))).exists()){await logout();$('err').textContent=t('blockedm');return}}catch(e){}
  acc=a;role=a===OWNER?'owner':ADMINS.includes(a)?'admin':'user';
  me={uid:a,displayName:nm||(role==='owner'?'Owner':role==='admin'?'Admin':'User')};
- $('login').hidden=true;['tChat','tProf','out'].forEach(i=>$(i).hidden=false);$('tAdm').hidden=role==='user';
+ $('login').hidden=true;['tChat','tProf','out'].forEach(i=>$(i).hidden=false);$('tAdm').hidden=role==='user';$('credcard').hidden=role!=='user';
  P={name:me.displayName,avatar:'',bio:'',theme:structuredClone(DEF)};
  const u=doc(db,'users',a),E=()=>{},bad=e=>{if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))};
  getDoc(u).then(s=>{if(!s.exists())setDoc(u,{name:me.displayName})}).catch(E);
  subs=[onSnapshot(u,s=>{if(s.exists()&&!P._l){P={...P,...s.data(),_l:1};if(P.lang&&T[P.lang]){L=P.lang;localStorage.lang=L;i18n()}}applyTheme(P.theme);renderProf()},E),
   onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]=d.data());draw();renderAdm();renderRooms()},E),
-  onSnapshot(query(collection(db,'rooms'),where('members','array-contains',a)),s=>{myRooms=s.docs.map(d=>({id:d.id,...d.data()}));if(cur.id!=='global'&&!myRooms.find(r=>r.id===cur.id))subRoom({id:'global',type:'global'});else renderRooms()},denied),onSnapshot(query(collection(db,'rooms'),where('type','==','channel')),s=>{chans=s.docs.map(d=>({id:d.id,...d.data()}))},E),
+  onSnapshot(query(collection(db,'rooms'),where('members','array-contains',a)),s=>{myRooms=s.docs.map(d=>({id:d.id,...d.data()}));if(cur.id!=='global'&&!myRooms.find(r=>r.id===cur.id))subRoom({id:'global',type:'global'});else renderRooms();watch()},denied),onSnapshot(query(collection(db,'rooms'),where('type','==','channel')),s=>{chans=s.docs.map(d=>({id:d.id,...d.data()}))},E),
   onSnapshot(doc(db,'mutes',a),s=>{muteUntil=s.exists()?s.data().until:0;$('txt').placeholder=Date.now()<muteUntil?t('muted'):t('msg')},E)];
  if(role!=='user'){buildAdm();subs.push(onSnapshot(collection(db,'accounts'),s=>{accs=s.docs.map(d=>({id:d.id,...d.data()}));renderAdm()},E),
   onSnapshot(collection(db,'blocked'),s=>{bl=new Set(s.docs.map(d=>d.id));renderAdm()},E),
