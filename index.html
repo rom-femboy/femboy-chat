@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Messenger</title>
+<title>Фембойский чатик</title>
 <style>
 :root{--bg:#f4f5f7;--tx:#1b1f24;--ac:#2b7de9;--pan:rgba(255,255,255,.55);--bd:rgba(128,128,128,.25)}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
@@ -39,10 +39,18 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
 #rbar{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--bd)}#rbar select{flex:1;min-width:0}
 .hit{display:flex;gap:8px;align-items:center;padding:4px 0}.hx{width:100%;font-family:monospace;margin-bottom:8px}
 .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.gal div{aspect-ratio:1;background:var(--pan);border:1px solid var(--bd);border-radius:8px;overflow:hidden;position:relative}.gal img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+#rbar{border-bottom:0;flex-direction:column;width:200px;flex:none;overflow:auto}
+#cmain{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0}
+#chat.l{flex-direction:row}#chat.r{flex-direction:row-reverse}#chat.t{flex-direction:column}
+#chat.l #rbar{border-right:1px solid var(--bd)}#chat.r #rbar{border-left:1px solid var(--bd)}
+#chat.t #rbar{flex-direction:row;width:auto;border-bottom:1px solid var(--bd);overflow-x:auto;align-items:center}
+#rtools{display:flex;gap:4px}#rlist{display:flex;flex-direction:column;gap:4px}#chat.t #rlist{flex-direction:row}
+.ri{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ri.on{background:var(--ac);color:#fff}
+@media(max-width:700px){#chat.l #rbar,#chat.r #rbar{width:112px}}
 </style></head><body>
 <div id="app">
  <nav>
-  <b>💬 Messenger</b>
+  <b>💬 Фембойский чатик</b>
   <button class="tab on" id="tChat" hidden></button><button class="tab" id="tProf" hidden></button><button class="tab" id="tAdm" hidden>🛡</button>
   <span class="sp"></span>
   <select id="lang"></select>
@@ -55,10 +63,12 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
  <p><input type="text" id="lname" autocomplete="username"></p><p><input type="password" id="lpass" autocomplete="current-password"></p>
  <button class="pri" id="gbtn"></button> <button id="diag">Проверка связи</button><p id="err" style="color:#e5484d"></p></div>
  <div id="chat" hidden>
-  <div id="rbar"><select id="rs"></select><button id="rnew">＋</button><button id="rch">📢</button><button id="rset">⚙</button></div>
+  <div id="rbar"><div id="rtools"><button id="rnew">＋</button><button id="rch">📢</button><button id="rset">⚙</button></div><div id="rlist"></div></div>
+  <div id="cmain">
   <div id="msgs"></div>
   <div id="bar"><button id="att">📎</button><input type="file" id="file" accept="image/*" hidden>
    <textarea id="txt" rows="1"></textarea><button id="mic">🎤</button><button class="pri" id="send">➤</button></div>
+  </div>
  </div>
  <div id="adm" hidden></div>
  <div id="prof" hidden>
@@ -70,6 +80,7 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
    <button class="pri" id="save" data-i="save"></button> <button id="reset" data-i="reset"></button> <span id="ok"></span>
   </div>
   <div class="card"><h3 data-i="theme"></h3><div id="rgb"></div></div>
+  <div class="card"><h3 data-i="iface"></h3><p data-i="listpos"></p><select id="lay"><option value="l"></option><option value="r"></option><option value="t"></option></select></div>
   <div class="card"><h3 data-i="gallery"></h3><div class="gal" id="gedit"></div><input type="file" id="gf" accept="image/*" hidden></div>
  </div>
 </div>
@@ -95,6 +106,8 @@ Object.assign(T.ru,{welcome:"Вход по коду",hint:"Личный код �
 Object.assign(T.en,{welcome:"Sign in with code",hint:"Your personal code was generated on this device. Copy it and send it to an admin with your name and password. To sign in to an existing account, replace the code with yours.",copy:"Copy code",newc:"New code",copied:"Copied ✓",pass:"Password",gin:"Sign in",need:"Enter name and password",badcode:"Code: 32 chars (admin 44, owner 88)",denied:"Sign-in failed: not approved, wrong data, or blocked",blockedm:"Account blocked",adduser:"Add user",code:"Code (32 chars)",mins:"Mute for how many minutes?",mute:"Mute",unmute:"Unmute",block:"Block",unblock:"Unblock",del:"Delete",muted:"You are muted by an admin",add:"Approve",added:"Added ✓",need2:"Code (32), name and password required"});
 Object.assign(T.ru,{gl:"Общий чат",k_dm:"Личный чат",k_group:"Группа",k_channel:"Канал",newchat:"Новый чат",search:"Поиск людей",chname:"Название",create:"Создать",cancel:"Отмена",channels:"Каналы",join:"Вступить",leave:"Покинуть",delroom:"Удалить чат",gallery:"Галерея (до 8 фото)",write:"Написать",close:"Закрыть",pick1:"Выберите людей",needn:"Введите название",nochan:"Нет доступных каналов"});
 Object.assign(T.en,{gl:"Global chat",k_dm:"Private chat",k_group:"Group",k_channel:"Channel",newchat:"New chat",search:"Search people",chname:"Title",create:"Create",cancel:"Cancel",channels:"Channels",join:"Join",leave:"Leave",delroom:"Delete chat",gallery:"Gallery (up to 8 photos)",write:"Message",close:"Close",pick1:"Pick people",needn:"Enter a title",nochan:"No channels available"});
+Object.assign(T.ru,{iface:"Интерфейс",listpos:"Расположение списка чатов",p_l:"Слева",p_r:"Справа",p_t:"Сверху"});
+Object.assign(T.en,{iface:"Interface",listpos:"Chat list position",p_l:"Left",p_r:"Right",p_t:"Top"});
 const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
 let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
 if(!T[L])L='en';
@@ -104,7 +117,7 @@ function applyTheme(th){th={...DEF,...(th||{})};const r=document.documentElement
 function i18n(){document.documentElement.lang=L;
  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
  $('gbtn').textContent=t('gin');$('out').textContent=t('out');$('tChat').textContent=t('chat');$('tProf').textContent=t('profile');
- $('pname').placeholder=t('name');$('lname').placeholder=t('name');$('lpass').placeholder=t('pass');$('pbio').placeholder=t('bio');$('txt').placeholder=t('msg');
+ $('pname').placeholder=t('name');[...$('lay').options].forEach(o=>o.textContent=t('p_'+o.value));$('lname').placeholder=t('name');$('lpass').placeholder=t('pass');$('pbio').placeholder=t('bio');$('txt').placeholder=t('msg');
  const s=$('lang');s.innerHTML='';const dn=new Intl.DisplayNames([L],{type:'language'});
  Object.keys(T).forEach(c=>{const o=new Option((dn.of(c)||c),c);o.selected=c===L;s.add(o)});
  s.add(new Option(t('other'),'__more'));buildRGB()}
@@ -192,10 +205,11 @@ let cur={id:'global',type:'global'},myRooms=[],chans=[],msgSub=null,G=[];
 function denied(e){if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))}
 const mcol=r=>r.id==='global'?collection(db,'messages'):collection(db,'rooms',r.id,'msgs');
 const rname=r=>r.id==='global'?'🌍 '+t('gl'):r.type==='dm'?'👤 '+((users[(r.members||[]).find(x=>x!==acc)]||{}).name||'?'):(r.type==='channel'?'📢 ':'👥 ')+r.name;
-function renderRooms(){const s=$('rs');s.innerHTML='';[{id:'global',type:'global'},...[...myRooms].sort((a,b)=>b.ts-a.ts)].forEach(r=>{const o=new Option(rname(r),r.id);o.selected=r.id===cur.id;s.add(o)})}
+function renderRooms(){const l=$('rlist');l.innerHTML='';[{id:'global',type:'global'},...[...myRooms].sort((a,b)=>b.ts-a.ts)].forEach(r=>{const b=document.createElement('button');b.className='ri'+(r.id===cur.id?' on':'');b.textContent=rname(r);b.onclick=()=>subRoom(r);l.append(b)})}
+const applyLay=()=>{const v=localStorage.lay||(innerWidth<700?'t':'l');$('chat').classList.remove('l','r','t');$('chat').classList.add(v);$('lay').value=v};
+$('lay').onchange=e=>{localStorage.lay=e.target.value;applyLay()};applyLay();
 function subRoom(r){cur=r;if(msgSub)msgSub();msgs=[];draw();$('bar').hidden=r.type==='channel'&&r.owner!==acc;renderRooms();
  msgSub=onSnapshot(query(mcol(r),orderBy('ts','desc'),limit(100)),s=>{msgs=s.docs.map(d=>d.data()).reverse();draw()},e=>{if(r.id!=='global')subRoom({id:'global',type:'global'});else denied(e)})}
-$('rs').onchange=e=>{const id=e.target.value;subRoom(id==='global'?{id:'global',type:'global'}:myRooms.find(r=>r.id===id))};
 $('rset').onclick=async()=>{if(cur.id==='global'||cur.type==='dm')return;const own=cur.owner===acc;
  try{if(own){if(confirm(t('delroom')+'?'))await deleteDoc(doc(db,'rooms',cur.id))}else if(confirm(t('leave')+'?'))await updateDoc(doc(db,'rooms',cur.id),{members:arrayRemove(acc)})}catch(e){alert(e.code)}};
 async function openDM(o){const id=[acc,o].sort().join('_');let r=myRooms.find(x=>x.id===id);
@@ -251,7 +265,7 @@ async function start(a,nm){
   onSnapshot(collection(db,'blocked'),s=>{bl=new Set(s.docs.map(d=>d.id));renderAdm()},E),
   onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E))}
  getDoc(doc(db,'galleries',a)).then(s=>{G=s.exists()?s.data().photos||[]:[];renderGal()}).catch(E);
- subRoom({id:'global',type:'global'});renderGal();tab('chat')}
+ subRoom({id:'global',type:'global'});renderGal();tab('prof')}
 newCode();
 try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true},DBID);
  $('diag').onclick=async()=>{$('err').textContent='…';const o=['проект: '+firebaseConfig.projectId,'вход: '+(fu?'ok':'нет')];
