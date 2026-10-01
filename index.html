@@ -197,6 +197,7 @@ try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFires
  $('diag').onclick=async()=>{$('err').textContent='…';const o=['проект: '+firebaseConfig.projectId,'вход: '+(fu?'ok':'нет')];
   try{await Promise.race([getDoc(doc(db,'sessions',fu.uid)),new Promise((_,r)=>setTimeout(()=>r({code:'timeout 10с'}),10000))]);o.push('база: ok')}catch(e){o.push('база: '+(e.code||'')+' '+(e.message||''))}
   try{await fetch('https://firestore.googleapis.com/',{mode:'no-cors'});o.push('сеть до базы: ok')}catch(e){o.push('сеть до базы: заблокирована')}
+  try{const tk=await fu.getIdToken(),r=await fetch('https://firestore.googleapis.com/v1/projects/'+firebaseConfig.projectId+'/databases/(default)/documents/sessions/'+fu.uid,{headers:{Authorization:'Bearer '+tk}}),j=await r.json().catch(()=>({}));o.push('REST '+r.status+': '+((j.error&&j.error.message)||'ok').slice(0,200))}catch(e){o.push('REST: '+e.message)}
   $('err').textContent=o.join(' | ')};
  $('out').onclick=logout;$('tAdm').onclick=()=>tab('adm');
  $('gbtn').onclick=async()=>{const c=$('code').value.trim(),n=$('lname').value,p=$('lpass').value;$('err').textContent='';
