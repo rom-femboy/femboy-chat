@@ -192,15 +192,16 @@ async function start(a,nm){
   onSnapshot(collection(db,'blocked'),s=>{bl=new Set(s.docs.map(d=>d.id));renderAdm()},E),
   onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E))}
  tab('chat')}
+newCode();
 try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);
  $('out').onclick=logout;$('tAdm').onclick=()=>tab('adm');
  $('gbtn').onclick=async()=>{const c=$('code').value.trim(),n=$('lname').value,p=$('lpass').value;$('err').textContent='';
-  if(!fu)return;if(c.length!==32&&c.length<44)return $('err').textContent=t('badcode');
+  if(!fu)return $('err').textContent='Нет подключения к Firebase, подождите и обновите страницу (Ctrl+F5)';if(c.length!==32&&c.length<44)return $('err').textContent=t('badcode');
   if(c.length<44&&(!n.trim()||!p))return $('err').textContent=t('need');
   try{const a=await ids(c);await setDoc(doc(db,'sessions',fu.uid),{acc:a,proof:await prf(c,n,p)});localStorage.nm=n.trim();if(c===localStorage.nc)localStorage.removeItem('nc');$('lpass').value='';await start(a,n.trim())}
-  catch(e){$('err').textContent=t('denied')}};
+  catch(e){$('err').textContent=t('denied')+' ['+(e.code||e.message)+']'}};
  onAuthStateChanged(auth,async u=>{if(!u){signInAnonymously(auth).catch(e=>$('err').textContent=e.code);return}
-  fu=u;try{const s=await getDoc(doc(db,'sessions',u.uid));if(s.exists()){await start(s.data().acc,localStorage.nm);return}}catch(e){}
+  fu=u;try{const s=await Promise.race([getDoc(doc(db,'sessions',u.uid)),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),7000))]);if(s.exists()){await start(s.data().acc,localStorage.nm);return}}catch(e){}
   showLogin()})}
 catch(e){$('err').textContent='Firebase: '+e.message}
 i18n();
