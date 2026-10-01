@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Messenger</title>
+<style>
+:root{--bg:#f4f5f7;--tx:#1b1f24;--ac:#2b7de9;--pan:rgba(255,255,255,.55);--bd:rgba(128,128,128,.25)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{display:flex;flex-direction:column;height:100%;max-width:900px;margin:0 auto}
+nav{display:flex;gap:6px;align-items:center;padding:10px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+nav .sp{flex:1}
+button,select{font:inherit;color:inherit;background:var(--pan);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;cursor:pointer}
+.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tab.on{border-color:var(--ac);font-weight:600}
+.av{width:36px;height:36px;border-radius:50%;background:var(--ac);color:#fff;display:inline-flex;align-items:center;justify-content:center;object-fit:cover;flex:none;font-weight:600}
+.big{width:96px;height:96px;font-size:36px}
+#login{margin:auto;text-align:center;padding:20px}
+#chat{flex:1;display:flex;flex-direction:column;min-height:0}
+#msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.m{display:flex;gap:8px;align-items:flex-end;max-width:85%}.m.me{align-self:flex-end;flex-direction:row-reverse}
+.bub{background:var(--pan);border:1px solid var(--bd);padding:8px 10px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
+.me .bub{background:color-mix(in srgb,var(--ac) 22%,transparent)}
+.bub b{display:block;font-size:12px;color:var(--ac)}.bub img{max-width:100%;max-height:280px;border-radius:8px;display:block}
+#bar{display:flex;gap:6px;padding:8px;border-top:1px solid var(--bd);align-items:flex-end}
+textarea,input[type=text]{flex:1;font:inherit;color:inherit;background:var(--pan);border:1px solid var(--bd);border-radius:12px;padding:9px 12px;outline:0;width:100%}
+#prof{flex:1;overflow:auto;padding:14px;display:grid;gap:14px;grid-template-columns:1fr 1fr;align-content:start}
+.card{border:1px solid var(--bd);border-radius:14px;padding:14px;background:var(--pan)}
+.card h3{margin:0 0 10px}.row{display:grid;grid-template-columns:20px 1fr 36px;gap:8px;align-items:center;font-size:13px}
+.sw{width:100%;height:28px;border-radius:8px;border:1px solid var(--bd);margin:4px 0 10px}
+input[type=range]{width:100%}.rec{color:#e5484d}
+@media(max-width:700px){#prof{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+#gt{padding:8px}
+</style></head><body>
+<div id="app">
+ <nav>
+  <b>💬 Messenger</b>
+  <button class="tab on" id="tChat" hidden></button><button class="tab" id="tProf" hidden></button>
+  <span class="sp"></span>
+  <select id="lang"></select>
+  <button id="out" hidden></button>
+ </nav>
+ <div id="gt" hidden><div id="google_translate_element"></div></div>
+ <div id="login"><h2 data-i="welcome"></h2><button class="pri" id="gbtn"></button><p id="err" style="color:#e5484d"></p></div>
+ <div id="chat" hidden>
+  <div id="msgs"></div>
+  <div id="bar"><button id="att">📎</button><input type="file" id="file" accept="image/*" hidden>
+   <textarea id="txt" rows="1"></textarea><button id="mic">🎤</button><button class="pri" id="send">➤</button></div>
+ </div>
+ <div id="prof" hidden>
+  <div class="card"><h3 data-i="profile"></h3>
+   <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><span id="pav" class="av big"></span>
+    <div><button id="upav" data-i="avatar"></button><input type="file" id="avf" accept="image/*" hidden></div></div>
+   <p><input type="text" id="pname" maxlength="40"></p>
+   <p><textarea id="pbio" rows="4" maxlength="300"></textarea></p>
+   <button class="pri" id="save" data-i="save"></button> <button id="reset" data-i="reset"></button> <span id="ok"></span>
+  </div>
+  <div class="card"><h3 data-i="theme"></h3><div id="rgb"></div></div>
+ </div>
+</div>
+<script type="module">
+// ==== 1. ВСТАВЬТЕ СВОЙ КОНФИГ FIREBASE (Project settings → Your apps → Web) ====
+const firebaseConfig={apiKey:"AIzaSyAe3x-wy4g1qXG1Tdfy6LSlcyhDFI3_HHI",authDomain:"private-chat-dbd32.firebaseapp.com",projectId:"private-chat-dbd32",storageBucket:"private-chat-dbd32.firebasestorage.app",messagingSenderId:"340774077910",appId:"1:340774077910:web:205345f731a5700a7bd077"};
+// ==============================================================================
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,doc,setDoc,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const $=id=>document.getElementById(id);
+const T={
+ru:{welcome:"Добро пожаловать",gin:"Войти через Google",out:"Выйти",chat:"Чат",profile:"Профиль",name:"Имя",bio:"О себе",avatar:"Сменить аватар",save:"Сохранить",reset:"Сбросить тему",theme:"Тема (RGB)",bg:"Фон",tx:"Текст",ac:"Акцент",msg:"Сообщение",saved:"Сохранено ✓",other:"Другие языки…"},
+en:{welcome:"Welcome",gin:"Sign in with Google",out:"Sign out",chat:"Chat",profile:"Profile",name:"Name",bio:"About me",avatar:"Change avatar",save:"Save",reset:"Reset theme",theme:"Theme (RGB)",bg:"Background",tx:"Text",ac:"Accent",msg:"Message",saved:"Saved ✓",other:"Other languages…"},
+uk:{welcome:"Ласкаво просимо",gin:"Увійти через Google",out:"Вийти",chat:"Чат",profile:"Профіль",name:"Ім'я",bio:"Про себе",avatar:"Змінити аватар",save:"Зберегти",reset:"Скинути тему",theme:"Тема (RGB)",bg:"Фон",tx:"Текст",ac:"Акцент",msg:"Повідомлення",saved:"Збережено ✓",other:"Інші мови…"},
+es:{welcome:"Bienvenido",gin:"Entrar con Google",out:"Salir",chat:"Chat",profile:"Perfil",name:"Nombre",bio:"Sobre mí",avatar:"Cambiar avatar",save:"Guardar",reset:"Restablecer tema",theme:"Tema (RGB)",bg:"Fondo",tx:"Texto",ac:"Acento",msg:"Mensaje",saved:"Guardado ✓",other:"Otros idiomas…"},
+de:{welcome:"Willkommen",gin:"Mit Google anmelden",out:"Abmelden",chat:"Chat",profile:"Profil",name:"Name",bio:"Über mich",avatar:"Avatar ändern",save:"Speichern",reset:"Theme zurücksetzen",theme:"Theme (RGB)",bg:"Hintergrund",tx:"Text",ac:"Akzent",msg:"Nachricht",saved:"Gespeichert ✓",other:"Weitere Sprachen…"},
+fr:{welcome:"Bienvenue",gin:"Se connecter avec Google",out:"Déconnexion",chat:"Chat",profile:"Profil",name:"Nom",bio:"À propos",avatar:"Changer l'avatar",save:"Enregistrer",reset:"Réinitialiser",theme:"Thème (RVB)",bg:"Fond",tx:"Texte",ac:"Accent",msg:"Message",saved:"Enregistré ✓",other:"Autres langues…"},
+tr:{welcome:"Hoş geldiniz",gin:"Google ile giriş",out:"Çıkış",chat:"Sohbet",profile:"Profil",name:"Ad",bio:"Hakkımda",avatar:"Avatarı değiştir",save:"Kaydet",reset:"Temayı sıfırla",theme:"Tema (RGB)",bg:"Arka plan",tx:"Metin",ac:"Vurgu",msg:"Mesaj",saved:"Kaydedildi ✓",other:"Diğer diller…"},
+zh:{welcome:"欢迎",gin:"使用 Google 登录",out:"退出",chat:"聊天",profile:"个人资料",name:"名称",bio:"简介",avatar:"更换头像",save:"保存",reset:"重置主题",theme:"主题 (RGB)",bg:"背景",tx:"文字",ac:"强调色",msg:"消息",saved:"已保存 ✓",other:"其他语言…"}};
+const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
+let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
+if(!T[L])L='en';
+const t=k=>(T[L]&&T[L][k])||T.en[k]||k;
+const rgb=a=>`rgb(${a.join(',')})`;
+function applyTheme(th){th={...DEF,...(th||{})};const r=document.documentElement.style;r.setProperty('--bg',rgb(th.bg));r.setProperty('--tx',rgb(th.tx));r.setProperty('--ac',rgb(th.ac))}
+function i18n(){document.documentElement.lang=L;
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+ $('gbtn').textContent=t('gin');$('out').textContent=t('out');$('tChat').textContent=t('chat');$('tProf').textContent=t('profile');
+ $('pname').placeholder=t('name');$('pbio').placeholder=t('bio');$('txt').placeholder=t('msg');
+ const s=$('lang');s.innerHTML='';const dn=new Intl.DisplayNames([L],{type:'language'});
+ Object.keys(T).forEach(c=>{const o=new Option((dn.of(c)||c),c);o.selected=c===L;s.add(o)});
+ s.add(new Option(t('other'),'__more'));buildRGB()}
+$('lang').onchange=e=>{if(e.target.value==='__more'){$('gt').hidden=false;loadGT();e.target.value=L;return}
+ L=e.target.value;localStorage.lang=L;i18n();if(me)renderProf();draw()};
+function loadGT(){if(window.google&&google.translate)return;window.gtInit=()=>new google.translate.TranslateElement({pageLanguage:L,autoDisplay:false},'google_translate_element');
+ const s=document.createElement('script');s.src='https://translate.google.com/translate_a/element.js?cb=gtInit';document.head.append(s)}
+function avatar(u,big){const e=u&&u.avatar?Object.assign(document.createElement('img'),{src:u.avatar}):document.createElement('span');
+ e.className='av'+(big?' big':'');if(!(u&&u.avatar))e.textContent=((u&&u.name)||'?')[0].toUpperCase();return e}
+// --- RGB panel ---
+function buildRGB(){const box=$('rgb');box.innerHTML='';
+ ['bg','tx','ac'].forEach(k=>{const w=document.createElement('div');w.innerHTML=`<b>${t(k)}</b><div class="sw"></div>`;const sw=w.querySelector('.sw');
+  const paint=()=>{sw.style.background=rgb(P.theme[k]);applyTheme(P.theme)};
+  ['R','G','B'].forEach((n,i)=>{const r=document.createElement('div');r.className='row';
+   const v=document.createElement('span'),inp=Object.assign(document.createElement('input'),{type:'range',min:0,max:255,value:(P.theme||DEF)[k][i]});
+   r.append(Object.assign(document.createElement('span'),{textContent:n}),inp,v);v.textContent=inp.value;
+   inp.oninput=()=>{P.theme[k][i]=+inp.value;v.textContent=inp.value;paint()};w.append(r)});
+  box.append(w);P.theme&&(sw.style.background=rgb(P.theme[k]))})}
+P.theme=structuredClone(DEF);
+function renderProf(){const a=avatar(P,true);a.id='pav';$('pav').replaceWith(a);$('pname').value=P.name||'';$('pbio').value=P.bio||'';buildRGB()}
+$('upav').onclick=()=>$('avf').click();
+const shrink=async(f,w,q0)=>{const img=new Image();img.src=URL.createObjectURL(f);await img.decode();let out;
+ for(let q=q0;q>.2;q-=.15){const k=Math.min(1,w/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*k;c.height=img.height*k;
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',q);if(out.length<200000)break;w*=.8}return out};
+$('avf').onchange=async e=>{const f=e.target.files[0];if(f){P.avatar=await shrink(f,256,.8);renderProf()}};
+$('reset').onclick=()=>{P.theme=structuredClone(DEF);applyTheme(P.theme);buildRGB()};
+$('save').onclick=async()=>{P.name=$('pname').value.trim()||me.displayName;P.bio=$('pbio').value;
+ try{await setDoc(doc(db,'users',me.uid),{name:P.name,bio:P.bio,avatar:P.avatar||'',theme:P.theme,lang:L});$('ok').textContent=t('saved')}
+ catch(e){$('ok').textContent=e.code}};
+// --- chat ---
+let msgs=[];
+function draw(){const box=$('msgs');if(!me)return;const bot=box.scrollHeight-box.scrollTop-box.clientHeight<90;box.innerHTML='';
+ msgs.forEach(m=>{const u=users[m.uid]||{name:m.name},d=document.createElement('div');d.className='m'+(m.uid===me.uid?' me':'');
+  const b=document.createElement('div');b.className='bub';
+  if(m.uid!==me.uid){const n=document.createElement('b');n.textContent=u.name||'?';b.append(n)}
+  if(m.kind==='img'){b.append(Object.assign(document.createElement('img'),{src:m.src}))}
+  else if(m.kind==='audio'){b.append(Object.assign(document.createElement('audio'),{src:m.src,controls:true}))}
+  else b.append(document.createTextNode(m.text||''));
+  d.append(avatar(u),b);box.append(d)});
+ if(bot)box.scrollTop=box.scrollHeight}
+const post=o=>addDoc(collection(db,'messages'),{uid:me.uid,name:P.name||me.displayName,ts:Date.now(),...o}).catch(e=>alert(e.code));
+$('send').onclick=()=>{const v=$('txt').value.trim();if(v){$('txt').value='';post({kind:'text',text:v})}};
+$('txt').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&innerWidth>700){e.preventDefault();$('send').click()}};
+$('att').onclick=()=>$('file').click();
+$('file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f)post({kind:'img',src:await shrink(f,900,.75)})};
+let mr,ch,tm;$('mic').onclick=async()=>{if(mr&&mr.state==='recording')return mr.stop();
+ try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mr=new MediaRecorder(s,{audioBitsPerSecond:16000});ch=[];
+  mr.ondataavailable=e=>ch.push(e.data);
+  mr.onstop=()=>{clearTimeout(tm);s.getTracks().forEach(x=>x.stop());$('mic').textContent='🎤';$('mic').classList.remove('rec');
+   const f=new FileReader();f.onload=()=>f.result.length<700000?post({kind:'audio',src:f.result}):alert('Too long');f.readAsDataURL(new Blob(ch,{type:mr.mimeType}))};
+  mr.start();$('mic').textContent='⏹';$('mic').classList.add('rec');tm=setTimeout(()=>mr.state==='recording'&&mr.stop(),45000)}catch(e){alert('Mic: '+e.name)}};
+// --- tabs & auth ---
+const tab=n=>{$('chat').hidden=n!=='chat';$('prof').hidden=n!=='prof';$('tChat').classList.toggle('on',n==='chat');$('tProf').classList.toggle('on',n==='prof')};
+$('tChat').onclick=()=>tab('chat');$('tProf').onclick=()=>tab('prof');
+try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);
+ $('gbtn').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>$('err').textContent=e.code+' — '+e.message);
+ $('out').onclick=()=>signOut(auth);
+ onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]=d.data());draw()},()=>{});
+ onAuthStateChanged(auth,u=>{me=u;const on=!!u;
+  ['login'].forEach(i=>$(i).hidden=on);['tChat','tProf','out'].forEach(i=>$(i).hidden=!on);
+  if(unsub){unsub();unsub=null}
+  if(!on){tab('none');$('chat').hidden=true;$('prof').hidden=true;applyTheme();return}
+  P={name:u.displayName,avatar:u.photoURL||'',bio:'',theme:structuredClone(DEF)};
+  onSnapshot(doc(db,'users',u.uid),s=>{if(s.exists()&&!P._l){P={...P,...s.data(),_l:1};if(P.lang&&T[P.lang]){L=P.lang;localStorage.lang=L;i18n()}}applyTheme(P.theme);renderProf()},()=>{});
+  unsub=onSnapshot(query(collection(db,'messages'),orderBy('ts','desc'),limit(100)),s=>{msgs=s.docs.map(d=>d.data()).reverse();draw()});
+  tab('chat')})}
+catch(e){$('err').textContent='Firebase config: '+e.message}
+i18n();
+</script></body></html>
