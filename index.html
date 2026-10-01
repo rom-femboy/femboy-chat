@@ -35,6 +35,10 @@ input[type=password]{font:inherit;color:inherit;background:var(--pan);border:1px
 #login{max-width:420px;width:100%}#login p{margin:8px 0}.hint{font-size:13px;opacity:.75}
 #adm{flex:1;overflow:auto;padding:14px;display:grid;gap:14px;align-content:start}
 .ur{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--bd)}.ur span{flex:1;min-width:120px}
+dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:14px;max-width:420px;width:92%;max-height:85vh;overflow:auto}dialog::backdrop{background:#0008}
+#rbar{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--bd)}#rbar select{flex:1;min-width:0}
+.hit{display:flex;gap:8px;align-items:center;padding:4px 0}.hx{width:100%;font-family:monospace;margin-bottom:8px}
+.gal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.gal div{aspect-ratio:1;background:var(--pan);border:1px solid var(--bd);border-radius:8px;overflow:hidden;position:relative}.gal img{width:100%;height:100%;object-fit:cover;cursor:pointer}
 </style></head><body>
 <div id="app">
  <nav>
@@ -51,6 +55,7 @@ input[type=password]{font:inherit;color:inherit;background:var(--pan);border:1px
  <p><input type="text" id="lname" autocomplete="username"></p><p><input type="password" id="lpass" autocomplete="current-password"></p>
  <button class="pri" id="gbtn"></button> <button id="diag">Проверка связи</button><p id="err" style="color:#e5484d"></p></div>
  <div id="chat" hidden>
+  <div id="rbar"><select id="rs"></select><button id="rnew">＋</button><button id="rch">📢</button><button id="rset">⚙</button></div>
   <div id="msgs"></div>
   <div id="bar"><button id="att">📎</button><input type="file" id="file" accept="image/*" hidden>
    <textarea id="txt" rows="1"></textarea><button id="mic">🎤</button><button class="pri" id="send">➤</button></div>
@@ -65,15 +70,17 @@ input[type=password]{font:inherit;color:inherit;background:var(--pan);border:1px
    <button class="pri" id="save" data-i="save"></button> <button id="reset" data-i="reset"></button> <span id="ok"></span>
   </div>
   <div class="card"><h3 data-i="theme"></h3><div id="rgb"></div></div>
+  <div class="card"><h3 data-i="gallery"></h3><div class="gal" id="gedit"></div><input type="file" id="gf" accept="image/*" hidden></div>
  </div>
 </div>
+<dialog id="dlg"></dialog><dialog id="pd"></dialog>
 <script type="module">
 // ==== 1. ВСТАВЬТЕ СВОЙ КОНФИГ FIREBASE (Project settings → Your apps → Web) ====
 const firebaseConfig={apiKey:"AIzaSyAe3x-wy4g1qXG1Tdfy6LSlcyhDFI3_HHI",authDomain:"private-chat-dbd32.firebaseapp.com",projectId:"private-chat-dbd32",storageBucket:"private-chat-dbd32.firebasestorage.app",messagingSenderId:"340774077910",appId:"1:340774077910:web:205345f731a5700a7bd077"};
 // ==============================================================================
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInAnonymously,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{initializeFirestore,doc,getDoc,deleteDoc,setDoc,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeFirestore,doc,getDoc,deleteDoc,setDoc,where,updateDoc,arrayUnion,arrayRemove,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 const T={
 ru:{welcome:"Добро пожаловать",gin:"Войти через Google",out:"Выйти",chat:"Чат",profile:"Профиль",name:"Имя",bio:"О себе",avatar:"Сменить аватар",save:"Сохранить",reset:"Сбросить тему",theme:"Тема (RGB)",bg:"Фон",tx:"Текст",ac:"Акцент",msg:"Сообщение",saved:"Сохранено ✓",other:"Другие языки…"},
@@ -86,6 +93,8 @@ tr:{welcome:"Hoş geldiniz",gin:"Google ile giriş",out:"Çıkış",chat:"Sohbet
 zh:{welcome:"欢迎",gin:"使用 Google 登录",out:"退出",chat:"聊天",profile:"个人资料",name:"名称",bio:"简介",avatar:"更换头像",save:"保存",reset:"重置主题",theme:"主题 (RGB)",bg:"背景",tx:"文字",ac:"强调色",msg:"消息",saved:"已保存 ✓",other:"其他语言…"}};
 Object.assign(T.ru,{welcome:"Вход по коду",hint:"Личный код создан на этом устройстве. Скопируйте его и отправьте администратору вместе с именем и паролем. Чтобы войти в существующий аккаунт, замените код на свой.",copy:"Копировать код",newc:"Новый код",copied:"Скопировано ✓",pass:"Пароль",gin:"Войти",need:"Введите имя и пароль",badcode:"Код: 32 символа (админ 44, владелец 88)",denied:"Не удалось войти: аккаунт не подтверждён, данные неверны или он заблокирован",blockedm:"Аккаунт заблокирован",adduser:"Добавить пользователя",code:"Код (32 символа)",mins:"На сколько минут заглушить?",mute:"Мут",unmute:"Снять мут",block:"Блок",unblock:"Разблок",del:"Удалить",muted:"Вы заглушены администратором",add:"Подтвердить",added:"Добавлен ✓",need2:"Нужны код (32), имя и пароль"});
 Object.assign(T.en,{welcome:"Sign in with code",hint:"Your personal code was generated on this device. Copy it and send it to an admin with your name and password. To sign in to an existing account, replace the code with yours.",copy:"Copy code",newc:"New code",copied:"Copied ✓",pass:"Password",gin:"Sign in",need:"Enter name and password",badcode:"Code: 32 chars (admin 44, owner 88)",denied:"Sign-in failed: not approved, wrong data, or blocked",blockedm:"Account blocked",adduser:"Add user",code:"Code (32 chars)",mins:"Mute for how many minutes?",mute:"Mute",unmute:"Unmute",block:"Block",unblock:"Unblock",del:"Delete",muted:"You are muted by an admin",add:"Approve",added:"Added ✓",need2:"Code (32), name and password required"});
+Object.assign(T.ru,{gl:"Общий чат",k_dm:"Личный чат",k_group:"Группа",k_channel:"Канал",newchat:"Новый чат",search:"Поиск людей",chname:"Название",create:"Создать",cancel:"Отмена",channels:"Каналы",join:"Вступить",leave:"Покинуть",delroom:"Удалить чат",gallery:"Галерея (до 8 фото)",write:"Написать",close:"Закрыть",pick1:"Выберите людей",needn:"Введите название",nochan:"Нет доступных каналов"});
+Object.assign(T.en,{gl:"Global chat",k_dm:"Private chat",k_group:"Group",k_channel:"Channel",newchat:"New chat",search:"Search people",chname:"Title",create:"Create",cancel:"Cancel",channels:"Channels",join:"Join",leave:"Leave",delroom:"Delete chat",gallery:"Gallery (up to 8 photos)",write:"Message",close:"Close",pick1:"Pick people",needn:"Enter a title",nochan:"No channels available"});
 const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
 let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
 if(!T[L])L='en';
@@ -106,14 +115,16 @@ function loadGT(){if(window.google&&google.translate)return;window.gtInit=()=>ne
 function avatar(u,big){const e=u&&u.avatar?Object.assign(document.createElement('img'),{src:u.avatar}):document.createElement('span');
  e.className='av'+(big?' big':'');if(!(u&&u.avatar))e.textContent=((u&&u.name)||'?')[0].toUpperCase();return e}
 // --- RGB panel ---
-function buildRGB(){const box=$('rgb');box.innerHTML='';
- ['bg','tx','ac'].forEach(k=>{const w=document.createElement('div');w.innerHTML=`<b>${t(k)}</b><div class="sw"></div>`;const sw=w.querySelector('.sw');
-  const paint=()=>{sw.style.background=rgb(P.theme[k]);applyTheme(P.theme)};
+function buildRGB(){const box=$('rgb');box.innerHTML='';const hx=a=>'#'+a.map(v=>v.toString(16).padStart(2,'0')).join('');
+ ['bg','tx','ac'].forEach(k=>{const w=document.createElement('div');w.innerHTML=`<b>${t(k)}</b><div class="sw"></div><input type="text" class="hx" maxlength="7" placeholder="#RRGGBB">`;
+  const sw=w.querySelector('.sw'),h=w.querySelector('.hx'),S=[];
+  const paint=skip=>{sw.style.background=rgb(P.theme[k]);if(!skip)h.value=hx(P.theme[k]);applyTheme(P.theme)};
   ['R','G','B'].forEach((n,i)=>{const r=document.createElement('div');r.className='row';
-   const v=document.createElement('span'),inp=Object.assign(document.createElement('input'),{type:'range',min:0,max:255,value:(P.theme||DEF)[k][i]});
-   r.append(Object.assign(document.createElement('span'),{textContent:n}),inp,v);v.textContent=inp.value;
+   const v=document.createElement('span'),inp=Object.assign(document.createElement('input'),{type:'range',min:0,max:255,value:P.theme[k][i]});
+   r.append(Object.assign(document.createElement('span'),{textContent:n}),inp,v);v.textContent=inp.value;S.push([inp,v]);
    inp.oninput=()=>{P.theme[k][i]=+inp.value;v.textContent=inp.value;paint()};w.append(r)});
-  box.append(w);P.theme&&(sw.style.background=rgb(P.theme[k]))})}
+  h.oninput=()=>{const m=/^#?([0-9a-f]{6})$/i.exec(h.value.trim());if(!m)return;const n=parseInt(m[1],16);P.theme[k]=[n>>16,(n>>8)&255,n&255];S.forEach(([inp,v],i)=>{inp.value=P.theme[k][i];v.textContent=inp.value});paint(1)};
+  box.append(w);paint()})}
 P.theme=structuredClone(DEF);
 function renderProf(){const a=avatar(P,true);a.id='pav';$('pav').replaceWith(a);$('pname').value=P.name||'';$('pbio').value=P.bio||'';buildRGB()}
 $('upav').onclick=()=>$('avf').click();
@@ -130,13 +141,13 @@ let msgs=[];
 function draw(){const box=$('msgs');if(!me)return;const bot=box.scrollHeight-box.scrollTop-box.clientHeight<90;box.innerHTML='';
  msgs.forEach(m=>{const u=users[m.uid]||{name:m.name},d=document.createElement('div');d.className='m'+(m.uid===me.uid?' me':'');
   const b=document.createElement('div');b.className='bub';
-  if(m.uid!==me.uid){const n=document.createElement('b');n.textContent=badge(m.uid)+(u.name||m.name||'?');b.append(n)}
+  if(m.uid!==me.uid){const n=document.createElement('b');n.textContent=badge(m.uid)+(u.name||m.name||'?');n.style.cursor='pointer';n.onclick=()=>openProf(m.uid);b.append(n)}
   if(m.kind==='img'){b.append(Object.assign(document.createElement('img'),{src:m.src}))}
   else if(m.kind==='audio'){b.append(Object.assign(document.createElement('audio'),{src:m.src,controls:true}))}
   else b.append(document.createTextNode(m.text||''));
-  d.append(avatar(u),b);box.append(d)});
+  const av=avatar(u);av.style.cursor='pointer';av.onclick=()=>openProf(m.uid);d.append(av,b);box.append(d)});
  if(bot)box.scrollTop=box.scrollHeight}
-const post=o=>Date.now()<muteUntil?alert(t('muted')):addDoc(collection(db,'messages'),{uid:me.uid,name:P.name||me.displayName,ts:Date.now(),...o}).catch(e=>alert(e.code));
+const post=o=>Date.now()<muteUntil?alert(t('muted')):addDoc(mcol(cur),{uid:me.uid,name:P.name||me.displayName,ts:Date.now(),...o}).catch(e=>alert(e.code));
 $('send').onclick=()=>{const v=$('txt').value.trim();if(v){$('txt').value='';post({kind:'text',text:v})}};
 $('txt').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&innerWidth>700){e.preventDefault();$('send').click()}};
 $('att').onclick=()=>$('file').click();
@@ -162,7 +173,7 @@ const newCode=()=>{$('code').value=localStorage.nc||(localStorage.nc=gen(32))};
 $('regen').onclick=()=>{localStorage.removeItem('nc');newCode()};
 $('cp').onclick=async()=>{try{await navigator.clipboard.writeText($('code').value)}catch(e){$('code').select();document.execCommand('copy')}$('cp').textContent=t('copied');setTimeout(()=>$('cp').textContent=t('copy'),1500)};
 function showLogin(){$('login').hidden=false;['tChat','tProf','tAdm','out','chat','prof','adm'].forEach(i=>$(i).hidden=true);applyTheme();newCode()}
-async function logout(){subs.forEach(f=>f());subs=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
+async function logout(){subs.forEach(f=>f());subs=[];if(msgSub){msgSub();msgSub=null}cur={id:'global',type:'global'};myRooms=[];G=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
 const mute=id=>{const m=+prompt(t('mins'),'10');return m>0?setDoc(doc(db,'mutes',id),{until:Date.now()+m*60000}):Promise.resolve()};
 function buildAdm(){const b=$('adm');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="ac" style="font-family:monospace"></p><p><input type="text" id="an"></p><p><input type="text" id="ap"></p><button class="pri" id="aadd"></button> <span id="ares"></span></div><div class="card"><div id="alist"></div></div>';
  b.querySelector('h3').textContent=t('adduser');$('ac').placeholder=t('code');$('an').placeholder=t('name');$('ap').placeholder=t('pass');$('aadd').textContent=t('add');
@@ -177,6 +188,53 @@ function renderAdm(){const l=$('alist');if(!l||role==='user')return;l.innerHTML=
   B(bl.has(r.id)?'unblock':'block',()=>bl.has(r.id)?deleteDoc(doc(db,'blocked',r.id)):setDoc(doc(db,'blocked',r.id),{ts:Date.now(),by:acc}));
   if(r.u)B('del',()=>confirm(t('del')+'?')?deleteDoc(doc(db,'accounts',r.id)):Promise.resolve());
   l.append(d)})}
+let cur={id:'global',type:'global'},myRooms=[],chans=[],msgSub=null,G=[];
+function denied(e){if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))}
+const mcol=r=>r.id==='global'?collection(db,'messages'):collection(db,'rooms',r.id,'msgs');
+const rname=r=>r.id==='global'?'🌍 '+t('gl'):r.type==='dm'?'👤 '+((users[(r.members||[]).find(x=>x!==acc)]||{}).name||'?'):(r.type==='channel'?'📢 ':'👥 ')+r.name;
+function renderRooms(){const s=$('rs');s.innerHTML='';[{id:'global',type:'global'},...[...myRooms].sort((a,b)=>b.ts-a.ts)].forEach(r=>{const o=new Option(rname(r),r.id);o.selected=r.id===cur.id;s.add(o)})}
+function subRoom(r){cur=r;if(msgSub)msgSub();msgs=[];draw();$('bar').hidden=r.type==='channel'&&r.owner!==acc;renderRooms();
+ msgSub=onSnapshot(query(mcol(r),orderBy('ts','desc'),limit(100)),s=>{msgs=s.docs.map(d=>d.data()).reverse();draw()},e=>{if(r.id!=='global')subRoom({id:'global',type:'global'});else denied(e)})}
+$('rs').onchange=e=>{const id=e.target.value;subRoom(id==='global'?{id:'global',type:'global'}:myRooms.find(r=>r.id===id))};
+$('rset').onclick=async()=>{if(cur.id==='global'||cur.type==='dm')return;const own=cur.owner===acc;
+ try{if(own){if(confirm(t('delroom')+'?'))await deleteDoc(doc(db,'rooms',cur.id))}else if(confirm(t('leave')+'?'))await updateDoc(doc(db,'rooms',cur.id),{members:arrayRemove(acc)})}catch(e){alert(e.code)}};
+async function openDM(o){const id=[acc,o].sort().join('_');let r=myRooms.find(x=>x.id===id);
+ if(!r){r={type:'dm',name:'',members:[acc,o].sort(),owner:acc,ts:Date.now()};await setDoc(doc(db,'rooms',id),r);r={...r,id};myRooms.push(r)}tab('chat');subRoom(r)}
+$('rnew').onclick=()=>{const d=$('dlg');d.innerHTML='<h3></h3><p><select id="nt"><option value="dm"></option><option value="group"></option><option value="channel"></option></select></p><p><input type="text" id="nn"></p><p><input type="text" id="nq"></p><div id="nl" style="max-height:220px;overflow:auto"></div><p><button class="pri" id="nok"></button> <button id="nx"></button> <span id="nres"></span></p>';
+ d.querySelector('h3').textContent=t('newchat');['dm','group','channel'].forEach((k,i)=>d.querySelectorAll('option')[i].textContent=t('k_'+k));
+ $('nn').placeholder=t('chname');$('nq').placeholder=t('search');$('nok').textContent=t('create');$('nx').textContent=t('cancel');
+ const pk=new Set(),res=m=>$('nres').textContent=m;
+ const list=()=>{const nl=$('nl');nl.innerHTML='';const q=$('nq').value.toLowerCase();
+  Object.entries(users).filter(([id,u])=>id!==acc&&(u.name||'').toLowerCase().includes(q)).forEach(([id,u])=>{const l=document.createElement('label');l.className='hit';
+   const c2=document.createElement('input');c2.type='checkbox';c2.checked=pk.has(id);c2.onchange=()=>c2.checked?pk.add(id):pk.delete(id);l.append(c2,avatar(u),document.createTextNode(' '+(u.name||'?')));nl.append(l)})};
+ const sync=()=>{const k=$('nt').value;$('nn').hidden=k==='dm';$('nl').hidden=$('nq').hidden=k==='channel'};
+ $('nt').onchange=sync;$('nq').oninput=list;sync();list();$('nx').onclick=()=>d.close();
+ $('nok').onclick=async()=>{const k=$('nt').value,nm=$('nn').value.trim(),pl=[...pk];
+  try{if(k==='dm'){if(pl.length!==1)return res(t('pick1'));d.close();return openDM(pl[0])}
+   if(!nm)return res(t('needn'));if(k==='group'&&!pl.length)return res(t('pick1'));
+   const r={type:k,name:nm,members:k==='channel'?[acc]:[acc,...pl],owner:acc,ts:Date.now()},ref=await addDoc(collection(db,'rooms'),r);
+   r.id=ref.id;myRooms.push(r);d.close();subRoom(r)}catch(e){res(e.code)}};d.showModal()};
+$('rch').onclick=()=>{const d=$('dlg');d.innerHTML='<h3></h3><div id="cl"></div><p><button id="cx2"></button></p>';d.querySelector('h3').textContent=t('channels');$('cx2').textContent=t('close');$('cx2').onclick=()=>d.close();
+ const o=chans.filter(c=>!(c.members||[]).includes(acc));if(!o.length)$('cl').textContent=t('nochan');
+ o.forEach(c=>{const r=document.createElement('div');r.className='ur';const sp=document.createElement('span');sp.textContent='📢 '+c.name;const b=document.createElement('button');b.className='pri';b.textContent=t('join');
+  b.onclick=async()=>{try{await updateDoc(doc(db,'rooms',c.id),{members:arrayUnion(acc)});d.close();subRoom({...c,members:[...c.members,acc]})}catch(e){alert(e.code)}};r.append(sp,b);$('cl').append(r)});d.showModal()};
+async function openProf(id){const d=$('pd'),u=users[id]||{};d.innerHTML='';
+ const head=document.createElement('div');head.style.cssText='display:flex;gap:12px;align-items:center';const nm=document.createElement('div');nm.innerHTML='<b></b><div></div>';
+ nm.children[0].textContent=badge(id)+(u.name||'?');nm.children[1].textContent=u.bio||'';head.append(avatar(u,true),nm);
+ const h=document.createElement('h4');h.textContent=t('gallery');
+ const big=document.createElement('img');big.style.cssText='width:100%;border-radius:10px;margin-top:10px;display:none';
+ const gal=document.createElement('div');gal.className='gal';
+ let ph=[];try{const s=await getDoc(doc(db,'galleries',id));ph=s.exists()?s.data().photos||[]:[]}catch(e){}
+ for(let i=0;i<8;i++){const c=document.createElement('div');if(ph[i]){const im=document.createElement('img');im.src=ph[i];im.onclick=()=>{big.src=ph[i];big.style.display='block'};c.append(im)}gal.append(c)}
+ const act=document.createElement('p');if(id!==acc){const b=document.createElement('button');b.className='pri';b.textContent=t('write');b.onclick=()=>{d.close();openDM(id).catch(e=>alert(e.code))};act.append(b,' ')}
+ const x=document.createElement('button');x.textContent=t('close');x.onclick=()=>d.close();act.append(x);d.append(head,h,gal,big,act);d.showModal()}
+function renderGal(){const g=$('gedit');g.innerHTML='';for(let i=0;i<8;i++){const c=document.createElement('div');
+ if(G[i]){const im=document.createElement('img');im.src=G[i];c.append(im);const x=document.createElement('button');x.textContent='✕';x.style.cssText='position:absolute;top:2px;right:2px;padding:2px 6px;background:#000a;color:#fff';x.onclick=()=>{G.splice(i,1);saveGal()};c.append(x)}
+ else{const b=document.createElement('button');b.textContent='+';b.style.cssText='width:100%;height:100%;font-size:24px';b.onclick=()=>$('gf').click();c.append(b)}g.append(c)}}
+const saveGal=()=>{renderGal();return setDoc(doc(db,'galleries',acc),{photos:G}).catch(e=>alert(e.code))};
+const shrinkG=async f=>{const img=new Image();img.src=URL.createObjectURL(f);await img.decode();let w=720,out;
+ for(let q=.7;;q-=.1){const k=Math.min(1,w/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*k;c.height=img.height*k;c.getContext('2d').drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',q);if(out.length<100000||q<.3)return out;if(q<.45)w*=.8}};
+$('gf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f&&G.length<8){G.push(await shrinkG(f));saveGal()}};
 async function start(a,nm){
  try{if((await getDoc(doc(db,'blocked',a))).exists()){await logout();$('err').textContent=t('blockedm');return}}catch(e){}
  acc=a;role=a===OWNER?'owner':ADMINS.includes(a)?'admin':'user';
@@ -186,13 +244,14 @@ async function start(a,nm){
  const u=doc(db,'users',a),E=()=>{},bad=e=>{if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))};
  getDoc(u).then(s=>{if(!s.exists())setDoc(u,{name:me.displayName})}).catch(E);
  subs=[onSnapshot(u,s=>{if(s.exists()&&!P._l){P={...P,...s.data(),_l:1};if(P.lang&&T[P.lang]){L=P.lang;localStorage.lang=L;i18n()}}applyTheme(P.theme);renderProf()},E),
-  onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]=d.data());draw();renderAdm()},E),
-  onSnapshot(query(collection(db,'messages'),orderBy('ts','desc'),limit(100)),s=>{msgs=s.docs.map(d=>d.data()).reverse();draw()},bad),
+  onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]=d.data());draw();renderAdm();renderRooms()},E),
+  onSnapshot(query(collection(db,'rooms'),where('members','array-contains',a)),s=>{myRooms=s.docs.map(d=>({id:d.id,...d.data()}));if(cur.id!=='global'&&!myRooms.find(r=>r.id===cur.id))subRoom({id:'global',type:'global'});else renderRooms()},denied),onSnapshot(query(collection(db,'rooms'),where('type','==','channel')),s=>{chans=s.docs.map(d=>({id:d.id,...d.data()}))},E),
   onSnapshot(doc(db,'mutes',a),s=>{muteUntil=s.exists()?s.data().until:0;$('txt').placeholder=Date.now()<muteUntil?t('muted'):t('msg')},E)];
  if(role!=='user'){buildAdm();subs.push(onSnapshot(collection(db,'accounts'),s=>{accs=s.docs.map(d=>({id:d.id,...d.data()}));renderAdm()},E),
   onSnapshot(collection(db,'blocked'),s=>{bl=new Set(s.docs.map(d=>d.id));renderAdm()},E),
   onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E))}
- tab('chat')}
+ getDoc(doc(db,'galleries',a)).then(s=>{G=s.exists()?s.data().photos||[]:[];renderGal()}).catch(E);
+ subRoom({id:'global',type:'global'});renderGal();tab('chat')}
 newCode();
 try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true},DBID);
  $('diag').onclick=async()=>{$('err').textContent='…';const o=['проект: '+firebaseConfig.projectId,'вход: '+(fu?'ok':'нет')];
