@@ -73,7 +73,7 @@ const firebaseConfig={apiKey:"AIzaSyAe3x-wy4g1qXG1Tdfy6LSlcyhDFI3_HHI",authDomai
 // ==============================================================================
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInAnonymously,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,doc,getDoc,deleteDoc,setDoc,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeFirestore,doc,getDoc,deleteDoc,setDoc,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 const T={
 ru:{welcome:"Добро пожаловать",gin:"Войти через Google",out:"Выйти",chat:"Чат",profile:"Профиль",name:"Имя",bio:"О себе",avatar:"Сменить аватар",save:"Сохранить",reset:"Сбросить тему",theme:"Тема (RGB)",bg:"Фон",tx:"Текст",ac:"Акцент",msg:"Сообщение",saved:"Сохранено ✓",other:"Другие языки…"},
@@ -193,12 +193,12 @@ async function start(a,nm){
   onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E))}
  tab('chat')}
 newCode();
-try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);
+try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true,useFetchStreams:false});
  $('out').onclick=logout;$('tAdm').onclick=()=>tab('adm');
  $('gbtn').onclick=async()=>{const c=$('code').value.trim(),n=$('lname').value,p=$('lpass').value;$('err').textContent='';
   if(!fu)return $('err').textContent='Нет подключения к Firebase, подождите и обновите страницу (Ctrl+F5)';if(c.length!==32&&c.length<44)return $('err').textContent=t('badcode');
   if(c.length<44&&(!n.trim()||!p))return $('err').textContent=t('need');
-  try{const a=await ids(c);await setDoc(doc(db,'sessions',fu.uid),{acc:a,proof:await prf(c,n,p)});localStorage.nm=n.trim();if(c===localStorage.nc)localStorage.removeItem('nc');$('lpass').value='';await start(a,n.trim())}
+  $('err').textContent='…';try{const a=await ids(c);await Promise.race([setDoc(doc(db,'sessions',fu.uid),{acc:a,proof:await prf(c,n,p)}),new Promise((_,r)=>setTimeout(()=>r({code:'timeout: нет связи с базой, отключите VPN/блокировщик рекламы'}),12000))]);$('err').textContent='';localStorage.nm=n.trim();if(c===localStorage.nc)localStorage.removeItem('nc');$('lpass').value='';await start(a,n.trim())}
   catch(e){$('err').textContent=t('denied')+' ['+(e.code||e.message)+']'}};
  onAuthStateChanged(auth,async u=>{if(!u){signInAnonymously(auth).catch(e=>$('err').textContent=e.code);return}
   fu=u;try{const s=await Promise.race([getDoc(doc(db,'sessions',u.uid)),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),7000))]);if(s.exists()){await start(s.data().acc,localStorage.nm);return}}catch(e){}
