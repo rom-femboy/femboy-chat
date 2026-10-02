@@ -9,8 +9,8 @@ body{background:var(--bg);color:var(--tx);font:15px system-ui,-apple-system,"Seg
 #app{display:flex;flex-direction:column;height:100%;max-width:900px;margin:0 auto}
 nav{display:flex;gap:6px;align-items:center;padding:10px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
 nav .sp{flex:1}
-button,select{font:inherit;color:inherit;background:var(--pan);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;cursor:pointer}
-.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+button,select{font:inherit;color:inherit;background:var(--pan);border:1px solid var(--bd);border-radius:var(--rad,10px);padding:8px 12px;cursor:pointer}
+.pri{background:var(--pri,var(--ac));color:#fff;border-color:var(--pri,var(--ac))}
 .tab.on{border-color:var(--ac);font-weight:600}
 .av{width:36px;height:36px;border-radius:50%;background:var(--ac);color:#fff;display:inline-flex;align-items:center;justify-content:center;object-fit:cover;flex:none;font-weight:600}
 .big{width:96px;height:96px;font-size:36px}
@@ -54,12 +54,22 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
 #ttl{text-align:center;font-weight:700;font-size:20px;padding:10px 8px 0}
 #rtools{flex-wrap:wrap}.rrow{display:flex;gap:2px}.rrow .ri{flex:1;min-width:0}.ri span:not(.bd){overflow:hidden;text-overflow:ellipsis}.mv{padding:4px 6px;font-size:11px}
 .bd{background:#e5484d;color:#fff;border-radius:10px;padding:0 6px;font-size:12px;margin-left:auto}
+#shop,#own{flex:1;overflow:auto;padding:14px;display:grid;gap:14px;align-content:start}
+#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;font-weight:600;text-align:center}
+.spin{width:56px;height:56px;border-radius:50%;border:6px solid var(--bd);border-top-color:var(--ac);animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}.item{border:1px solid var(--bd);border-radius:12px;padding:8px;text-align:center;background:var(--pan);display:flex;flex-direction:column;gap:6px}
+.pv{height:72px;display:flex;align-items:center;justify-content:center;font-size:36px}.pv img{max-height:72px;max-width:100%}
+.fw{display:inline-flex;padding:3px;border-radius:50%;position:relative;flex:none}.fw .av{border:2px solid var(--bg)}.fw .fo{position:absolute;inset:-12%;width:124%;height:124%;pointer-events:none}.fw.sm .av{width:24px;height:24px;font-size:12px}
+.wall{position:relative;aspect-ratio:1;border:1px solid var(--bd);border-radius:12px;overflow:hidden;container-type:inline-size}
+.stk{position:absolute;touch-action:none;transform:translate(-50%,-50%);user-select:none;line-height:1}.stk img{width:100%;display:block;pointer-events:none}.stk.sel{outline:2px dashed var(--ac)}
+#cv{background:repeating-conic-gradient(#8885 0 25%,transparent 0 50%) 0 0/16px 16px}
 </style></head><body>
+<div id="splash"><div style="font-size:22px">🏳️‍⚧️ Фембойский чатик 🏳️‍⚧️</div><div class="spin"></div><div id="sptxt"></div></div>
 <div id="app">
  <div id="ttl">🏳️‍⚧️ Фембойский чатик 🏳️‍⚧️</div>
  <nav>
   
-  <button class="tab on" id="tChat" hidden></button><button class="tab" id="tProf" hidden></button><button class="tab" id="tAdm" hidden>🛡</button>
+  <button class="tab on" id="tChat" hidden></button><button class="tab" id="tProf" hidden></button><button class="tab" id="tShop" hidden>🛒</button><button class="tab" id="tAdm" hidden>🛡</button><button class="tab" id="tOwn" hidden>👑</button>
   <span class="sp"></span>
   <select id="lang"></select>
   <button id="out" hidden></button>
@@ -69,7 +79,7 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
  <p><input type="text" id="code" autocomplete="off" spellcheck="false" style="font-family:monospace"></p>
  <p><button id="cp" data-i="copy"></button> <button id="regen" data-i="newc"></button></p>
  <p><input type="text" id="lname" autocomplete="username"></p><p><input type="password" id="lpass" autocomplete="current-password"></p>
- <button class="pri" id="gbtn"></button> <button id="diag">Проверка связи</button><p id="err" style="color:#e5484d"></p></div>
+ <button class="pri" id="gbtn"></button> <button id="diag">Проверка связи</button><p><button id="sup" data-i="supp"></button></p><p id="err" style="color:#e5484d"></p></div>
  <div id="chat" hidden>
   <div id="rbar"><div id="rtools"><button id="rnew">＋</button><button id="rch">📢</button><button id="rsr">🔍</button><button id="rord">⇅</button><button id="rset">⚙</button></div><div id="rlist"></div></div>
   <div id="cmain"><div id="chead"></div>
@@ -78,7 +88,7 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
    <textarea id="txt" rows="1"></textarea><button id="mic">🎤</button><button class="pri" id="send">➤</button></div>
   </div>
  </div>
- <div id="adm" hidden></div>
+ <div id="adm" hidden></div><div id="shop" hidden></div><div id="own" hidden></div>
  <div id="prof" hidden>
   <div class="card"><h3 data-i="profile"></h3>
    <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><span id="pav" class="av big"></span>
@@ -89,18 +99,20 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
   </div>
   <div class="card"><h3 data-i="theme"></h3><div id="rgb"></div></div>
   <div class="card"><h3 data-i="iface"></h3><p data-i="listpos"></p><select id="lay"><option value="l"></option><option value="r"></option><option value="t"></option></select></div>
+  <div class="card"><h3 data-i="wall"></h3><div id="wedit"></div></div>
+  <div class="card"><h3 data-i="supp"></h3><button id="supbtn" data-i="opensup"></button></div>
   <div class="card" id="credcard"><h3 data-i="secur"></h3><button id="credbtn" data-i="chcred"></button></div>
   <div class="card"><h3 data-i="gallery"></h3><div class="gal" id="gedit"></div><input type="file" id="gf" accept="image/*" hidden></div>
  </div>
 </div>
-<dialog id="lb" style="max-width:96vw;width:auto;padding:6px"><img id="lbi" style="max-width:100%;max-height:88vh;display:block;margin:auto;border-radius:8px"></dialog><div id="ep" hidden></div><dialog id="dlg"></dialog><dialog id="pd"></dialog>
+<dialog id="lb" style="max-width:96vw;width:auto;padding:6px"><img id="lbi" style="max-width:100%;max-height:88vh;display:block;margin:auto;border-radius:8px"></dialog><div id="ep" hidden></div><dialog id="dlg"></dialog><dialog id="cr"></dialog><dialog id="pd"></dialog>
 <script type="module">
 // ==== 1. ВСТАВЬТЕ СВОЙ КОНФИГ FIREBASE (Project settings → Your apps → Web) ====
 const firebaseConfig={apiKey:"AIzaSyAe3x-wy4g1qXG1Tdfy6LSlcyhDFI3_HHI",authDomain:"private-chat-dbd32.firebaseapp.com",projectId:"private-chat-dbd32",storageBucket:"private-chat-dbd32.firebasestorage.app",messagingSenderId:"340774077910",appId:"1:340774077910:web:205345f731a5700a7bd077"};
 // ==============================================================================
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInAnonymously,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{initializeFirestore,doc,getDoc,deleteDoc,setDoc,where,updateDoc,arrayUnion,arrayRemove,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeFirestore,doc,getDoc,deleteDoc,setDoc,writeBatch,where,updateDoc,arrayUnion,arrayRemove,collection,addDoc,query,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 const T={
 ru:{welcome:"Добро пожаловать",gin:"Войти через Google",out:"Выйти",chat:"Чат",profile:"Профиль",name:"Имя",bio:"О себе",avatar:"Сменить аватар",save:"Сохранить",reset:"Сбросить тему",theme:"Тема (RGB)",bg:"Фон",tx:"Текст",ac:"Акцент",msg:"Сообщение",saved:"Сохранено ✓",other:"Другие языки…"},
@@ -120,6 +132,8 @@ Object.assign(T.en,{iface:"Interface",listpos:"Chat list position",p_l:"Left",p_
 Object.assign(T.ru,{delmsg:"Удалить сообщение"});Object.assign(T.en,{delmsg:"Delete message"});
 Object.assign(T.ru,{people:"Поиск людей",secur:"Безопасность",chcred:"Сменить логин и пароль",curc:"Ваш код (32 символа)",curn:"Текущее имя для входа",curp:"Текущий пароль",newn:"Новое имя для входа",newp:"Новый пароль",need3:"Заполните все поля",wrongc:"Код, имя или пароль не подходят",csaved:"Сохранено ✓"});
 Object.assign(T.en,{people:"Find people",secur:"Security",chcred:"Change login and password",curc:"Your code (32 chars)",curn:"Current login name",curp:"Current password",newn:"New login name",newp:"New password",need3:"Fill in all fields",wrongc:"Code, name or password is wrong",csaved:"Saved ✓"});
+Object.assign(T.ru,{ld1:"Подключаемся…",ld2:"Загружаем профиль…",ld3:"Готовим чаты…",ld4:"Почти готово…",supp:"Тех. поддержка",opensup:"Написать в поддержку",wall:"Стикеры на странице",shop:"Магазин",promo:"Промокод",redeem:"Активировать",buy:"Купить",owned:"Куплено",equip:"Надеть",unequip:"Снять",ty_sticker:"Стикер",ty_frame:"Рамка",ty_icons:"Иконки",ty_buttons:"Кнопки",nocoin:"Не хватает коинов",colors:"Цвета",bought:"Покупки",mycode:"Мой код",sendcode:"Отправить мой код",tofill:"В форму добавления",handledby:"Отвечает:",wait:"Ожидайте, скоро ответят",nosup:"Обращений нет",free:"свободно",open:"Открыть",admname:"Имя нового админа",newadm:"Создать админа",savecode:"Скопируйте код сейчас: потом его не показать",deladm:"Убрать админа",chcode:"Сменить код",newcodel:"Новый код (32 символа)",gen:"Создать",promos:"Промокоды",pcode:"Код промокода",pcoins:"Сколько коинов",pmax:"Сколько активаций",promobad:"Неверный или уже использованный промокод",upimg:"Загрузить фото",iconhint:"8 иконок через пробел",priceph:"Цена в коинах",ownshop:"Редактор магазина",crop:"Обрезка",done:"Применить",codeused:"Такой код уже занят",codechd:"Код изменён ✓"});
+Object.assign(T.en,{ld1:"Connecting…",ld2:"Loading profile…",ld3:"Preparing chats…",ld4:"Almost done…",supp:"Support",opensup:"Contact support",wall:"Profile stickers",shop:"Shop",promo:"Promo code",redeem:"Redeem",buy:"Buy",owned:"Owned",equip:"Equip",unequip:"Unequip",ty_sticker:"Sticker",ty_frame:"Frame",ty_icons:"Icons",ty_buttons:"Buttons",nocoin:"Not enough coins",colors:"Colors",bought:"Purchases",mycode:"My code",sendcode:"Send my code",tofill:"To add form",handledby:"Handled by:",wait:"Please wait for a reply",nosup:"No requests",free:"free",open:"Open",admname:"New admin name",newadm:"Create admin",savecode:"Copy the code now, it cannot be shown again",deladm:"Remove admin",chcode:"Change code",newcodel:"New code (32 chars)",gen:"Generate",promos:"Promo codes",pcode:"Promo code",pcoins:"Coins amount",pmax:"Max uses",promobad:"Invalid or already used promo code",upimg:"Upload image",iconhint:"8 icons separated by spaces",priceph:"Price in coins",ownshop:"Shop editor",crop:"Crop",done:"Apply",codeused:"This code is taken",codechd:"Code changed ✓"});
 const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
 let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
 if(!T[L])L='en';
@@ -138,7 +152,12 @@ $('lang').onchange=e=>{if(e.target.value==='__more'){$('gt').hidden=false;loadGT
 function loadGT(){if(window.google&&google.translate)return;window.gtInit=()=>new google.translate.TranslateElement({pageLanguage:L,autoDisplay:false},'google_translate_element');
  const s=document.createElement('script');s.src='https://translate.google.com/translate_a/element.js?cb=gtInit';document.head.append(s)}
 function avatar(u,big){const e=u&&u.avatar?Object.assign(document.createElement('img'),{src:u.avatar}):document.createElement('span');
- e.className='av'+(big?' big':'');if(!(u&&u.avatar))e.textContent=((u&&u.name)||'?')[0].toUpperCase();return e}
+ e.className='av'+(big?' big':'');if(!(u&&u.avatar))e.textContent=((u&&u.name)||'?')[0].toUpperCase();
+ const f=u&&u._id&&frameOf(u._id);if(!f)return e;
+ const w=document.createElement('span');w.className='fw';
+ if(f.data.img){w.style.padding='0';w.append(e,Object.assign(document.createElement('img'),{src:f.data.img,className:'fo'}))}
+ else{w.style.background=FR[f.data.preset]||FR.gold;w.append(e)}
+ return w}
 // --- RGB panel ---
 function buildRGB(){const box=$('rgb');box.innerHTML='';const hx=a=>'#'+a.map(v=>v.toString(16).padStart(2,'0')).join('');
  ['bg','tx','ac'].forEach(k=>{const w=document.createElement('div');w.innerHTML=`<b>${t(k)}</b><div class="sw"></div><input type="text" class="hx" maxlength="7" placeholder="#RRGGBB">`;
@@ -184,11 +203,12 @@ let mr,ch,tm;$('mic').onclick=async()=>{if(mr&&mr.state==='recording')return mr.
    const f=new FileReader();f.onload=()=>f.result.length<700000?post({kind:'audio',src:f.result}):alert('Too long');f.readAsDataURL(new Blob(ch,{type:mr.mimeType}))};
   mr.start();$('mic').textContent='⏹';$('mic').classList.add('rec');tm=setTimeout(()=>mr.state==='recording'&&mr.stop(),45000)}catch(e){alert('Mic: '+e.name)}};
 // --- tabs & auth ---
-const tab=n=>{[['chat','tChat'],['prof','tProf'],['adm','tAdm']].forEach(([k,b])=>{$(k).hidden=n!==k;$(b).classList.toggle('on',n===k)});if(n==='chat'&&msgs.length)markRead(cur.id,msgs[msgs.length-1].ts)};
+const tab=n=>{[['chat','tChat'],['prof','tProf'],['adm','tAdm'],['shop','tShop'],['own','tOwn']].forEach(([k,b])=>{$(k).hidden=n!==k;$(b).classList.toggle('on',n===k)});if(n==='chat'&&msgs.length)markRead(cur.id,msgs[msgs.length-1].ts)};
 $('tChat').onclick=()=>tab('chat');$('tProf').onclick=()=>tab('prof');
 const DBID='default'; // имя базы Firestore (в консоли: Firestore → поле рядом с названием; для основной базы поставьте '(default)')
+const CHIEF="a75c205286a181612117f4ea7715cee52d94c73b286c83de130ae221bb5ecf25";
 const OWNER="212b99b4e8f59d297419d25893198e20b80ac3bc0ad61c3c4cb28d6346025431",ADMINS=["0db9def0a9c2eecaf69a75c4a978ca192b8971d879b2f78dcb03159d70a1d597", "34c1ab3889df5c9b1b90a3558be30fe891394dbd0f9909b1f209f25c814e5bce", "7dc048737291c70113de6cd74eb7646f867e7ad22902bd768fe6ce16c5a84428", "7d9c7dbe05a017331c63010e680d7e1407f5107de1370176c85b0894bf230df3", "362c567767cff1fe42375a8b216557aef87ceb85450c5d4417a40260ee7c1aa1", "e7d8360683ffca52c8039278c46648efa82f18336c42089f8d8ff9a578e39889", "a56cda48b11adb57fbfa77bf5e8cb502ababaa17e9b2dec6ad70a2883e2c2031"];
-const badge=a=>a===OWNER?'👑 ':ADMINS.includes(a)?'🛡 ':'';
+const badge=a=>a===OWNER?'👑 ':a===CHIEF?'⭐ ':(ADMINS.includes(a)||staffD[a])?'🛡 ':'';
 const AB='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const gen=n=>{let s='';while(s.length<n)for(const b of crypto.getRandomValues(new Uint8Array(n)))if(b<248&&s.length<n)s+=AB[b%62];return s};
 const sha=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -197,23 +217,24 @@ let fu,acc=null,role='user',subs=[],muteUntil=0,accs=[],bl=new Set(),mu={};
 const newCode=()=>{$('code').value=localStorage.nc||(localStorage.nc=gen(32))};
 $('regen').onclick=()=>{localStorage.removeItem('nc');newCode()};
 $('cp').onclick=async()=>{try{await navigator.clipboard.writeText($('code').value)}catch(e){$('code').select();document.execCommand('copy')}$('cp').textContent=t('copied');setTimeout(()=>$('cp').textContent=t('copy'),1500)};
-function showLogin(){$('login').hidden=false;['tChat','tProf','tAdm','out','chat','prof','adm'].forEach(i=>$(i).hidden=true);applyTheme();newCode()}
-async function logout(){subs.forEach(f=>f());subs=[];if(msgSub){msgSub();msgSub=null}if(rxSub){rxSub();rxSub=null}Object.values(usubs).forEach(f=>f());usubs={};un={};cur={id:'global',type:'global'};myRooms=[];G=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
+function showLogin(){splash(false);$('login').hidden=false;['tChat','tProf','tAdm','tShop','tOwn','out','chat','prof','adm','shop','own'].forEach(i=>$(i).hidden=true);applyTheme();newCode()}
+async function logout(){subs.forEach(f=>f());subs=[];if(msgSub){msgSub();msgSub=null}wal={};shopItems={};staffD={};threads=[];if(rxSub){rxSub();rxSub=null}Object.values(usubs).forEach(f=>f());usubs={};un={};cur={id:'global',type:'global'};myRooms=[];G=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
 const mute=id=>{const m=+prompt(t('mins'),'10');return m>0?setDoc(doc(db,'mutes',id),{until:Date.now()+m*60000}):Promise.resolve()};
-function buildAdm(){const b=$('adm');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="ac" style="font-family:monospace"></p><p><input type="text" id="an"></p><p><input type="text" id="ap"></p><button class="pri" id="aadd"></button> <span id="ares"></span></div><div class="card"><div id="alist"></div></div>';
- b.querySelector('h3').textContent=t('adduser');$('ac').placeholder=t('code');$('an').placeholder=t('name');$('ap').placeholder=t('pass');$('aadd').textContent=t('add');
+function buildAdm(){const b=$('adm');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="ac" style="font-family:monospace"></p><p><input type="text" id="an"></p><p><input type="text" id="ap"></p><button class="pri" id="aadd"></button> <span id="ares"></span></div><div class="card"><h3 id="supt"></h3><div id="slist"></div></div><div class="card"><div id="aaw"></div><div id="alist"></div></div>';
+ b.querySelector('h3').textContent=t('adduser');$('supt').textContent=t('supp');if(isTop()){const x=document.createElement('button');x.className='pri';x.textContent=t('newadm');x.onclick=()=>addAdmin().catch(e=>alert(e.code));$('aaw').append(x)}$('ac').placeholder=t('code');$('an').placeholder=t('name');$('ap').placeholder=t('pass');$('aadd').textContent=t('add');
  $('aadd').onclick=async()=>{const c=$('ac').value.trim(),n=$('an').value.trim(),p=$('ap').value;if(c.length!==32||!n||!p)return $('ares').textContent=t('need2');
   try{await setDoc(doc(db,'accounts',await ids(c)),{proof:await prf(c,n,p),name:n,ts:Date.now()});$('ares').textContent=t('added');$('ac').value=$('an').value=$('ap').value=''}catch(e){$('ares').textContent=e.code}}}
 function renderAdm(){const l=$('alist');if(!l||role==='user')return;l.innerHTML='';
- const rows=[...accs.map(x=>({id:x.id,name:x.name,u:1})),...(role==='owner'?ADMINS.map((id,i)=>({id,name:'Admin '+(i+1)})):[])].filter(r=>r.id!==acc);
+ const sf=[];if(role==='owner')sf.push({id:CHIEF,name:'Chief'});if(isTop()){ADMINS.forEach((id,i)=>sf.push({id,name:'Admin '+(i+1)}));Object.entries(staffD).forEach(([id,v])=>sf.push({id,name:v.name,dyn:1}))}
+ const rows=[...accs.map(x=>({id:x.id,name:x.name,u:1})),...sf].filter(r=>r.id!==acc);
  rows.forEach(r=>{const d=document.createElement('div');d.className='ur';const s=document.createElement('span'),m=mu[r.id]>Date.now();
   s.textContent=badge(r.id)+(r.u?r.name:((users[r.id]&&users[r.id].name)||r.name))+(bl.has(r.id)?' 🚫':'')+(m?' 🔇 '+new Date(mu[r.id]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'');d.append(s);
   const B=(k,f)=>{const x=document.createElement('button');x.textContent=t(k);x.onclick=()=>f().catch(e=>alert(e.code));d.append(x)};
   B(m?'unmute':'mute',()=>m?deleteDoc(doc(db,'mutes',r.id)):mute(r.id));
   B(bl.has(r.id)?'unblock':'block',()=>bl.has(r.id)?deleteDoc(doc(db,'blocked',r.id)):setDoc(doc(db,'blocked',r.id),{ts:Date.now(),by:acc}));
-  if(r.u)B('del',()=>confirm(t('del')+'?')?deleteDoc(doc(db,'accounts',r.id)):Promise.resolve());
+  if(r.u)B('del',()=>confirm(t('del')+'?')?deleteDoc(doc(db,'accounts',r.id)):Promise.resolve());if(r.u&&isTop())B('chcode',()=>{codeDlg(r);return Promise.resolve()});if(r.dyn)B('deladm',()=>delAdmin(r.id));
   l.append(d)})}
-let un={},usubs={},edit=false,rx={},rxSub=null,cur={id:'global',type:'global'},myRooms=[],chans=[],msgSub=null,G=[];
+let staffD={},wal={},shopItems={},threads=[],promos=[],first=Promise.resolve(),firstRes=()=>{},un={},usubs={},edit=false,rx={},rxSub=null,cur={id:'global',type:'global'},myRooms=[],chans=[],msgSub=null,G=[];
 function denied(e){if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))}
 const mcol=r=>r.id==='global'?collection(db,'messages'):collection(db,'rooms',r.id,'msgs');
 const rname=r=>r.id==='global'?'🌍 '+t('gl'):r.type==='dm'?((users[(r.members||[]).find(x=>x!==acc)]||{}).name||'?'):(r.type==='channel'?'📢 ':'👥 ')+r.name;
@@ -266,7 +287,7 @@ async function openProf(id){const d=$('pd'),u=users[id]||{};d.innerHTML='';
  let ph=[];try{const s=await getDoc(doc(db,'galleries',id));ph=s.exists()?s.data().photos||[]:[]}catch(e){}
  for(let i=0;i<8;i++){const c=document.createElement('div');if(ph[i]){const im=document.createElement('img');im.src=ph[i];im.onclick=()=>zoom(ph[i]);c.append(im)}gal.append(c)}
  const act=document.createElement('p');if(id!==acc){const b=document.createElement('button');b.className='pri';b.textContent=t('write');b.onclick=()=>{d.close();openDM(id).catch(e=>alert(e.code))};act.append(b,' ')}
- const x=document.createElement('button');x.textContent=t('close');x.onclick=()=>d.close();act.append(x);d.append(head,h,gal,big,act);d.showModal()}
+ const x=document.createElement('button');x.textContent=t('close');x.onclick=()=>d.close();act.append(x);d.append(head,extra(id),h,gal,big,act);d.showModal()}
 function renderGal(){const g=$('gedit');g.innerHTML='';for(let i=0;i<8;i++){const c=document.createElement('div');
  if(G[i]){const im=document.createElement('img');im.src=G[i];im.onclick=()=>zoom(G[i]);c.append(im);const x=document.createElement('button');x.textContent='✕';x.style.cssText='position:absolute;top:2px;right:2px;padding:2px 6px;background:#000a;color:#fff';x.onclick=()=>{G.splice(i,1);saveGal()};c.append(x)}
  else{const b=document.createElement('button');b.textContent='+';b.style.cssText='width:100%;height:100%;font-size:24px';b.onclick=()=>$('gf').click();c.append(b)}g.append(c)}}
@@ -307,25 +328,156 @@ $('credbtn').onclick=()=>{const d=$('dlg');d.innerHTML='<h3></h3><p><input type=
  d.querySelector('h3').textContent=t('chcred');[['cc','curc'],['co','curn'],['cp0','curp'],['cn','newn'],['cp1','newp']].forEach(([i,k])=>$(i).placeholder=t(k));$('cok').textContent=t('save');$('cx3').textContent=t('close');$('cx3').onclick=()=>d.close();
  $('cok').onclick=async()=>{const c=$('cc').value.trim(),o=$('co').value,p0=$('cp0').value,n=$('cn').value.trim(),p1=$('cp1').value,res=m=>$('cres').textContent=m;
   if(c.length!==32||!o||!p0||!n||!p1)return res(t('need3'));
-  try{if(await ids(c)!==acc)return res(t('wrongc'));const ss=await getDoc(doc(db,'sessions',fu.uid));if(!ss.exists()||ss.data().proof!==await prf(c,o,p0))return res(t('wrongc'));
+  try{if(await resolveAcc(c)!==acc)return res(t('wrongc'));const ss=await getDoc(doc(db,'sessions',fu.uid));if(!ss.exists()||ss.data().proof!==await prf(c,o,p0))return res(t('wrongc'));
    const np=await prf(c,n,p1);await updateDoc(doc(db,'accounts',acc),{proof:np,name:n});await setDoc(doc(db,'sessions',fu.uid),{acc,proof:np});localStorage.nm=n;res(t('csaved'))}catch(e){res(e.code||e.message)}};d.showModal()};
+
+const isTop=()=>role==='owner'||role==='chief';
+const FR={gold:'conic-gradient(#ffd700,#fff3a0,#ffb300,#ffd700)',rainbow:'conic-gradient(red,orange,yellow,lime,cyan,blue,violet,red)',pink:'linear-gradient(135deg,#ff6ec7,#ffd1f0)',ice:'linear-gradient(135deg,#6fd3ff,#e6f7ff)',emerald:'linear-gradient(135deg,#1fbf6a,#a8f5c4)',fire:'conic-gradient(#ff3d00,#ffc400,#ff3d00)'};
+const DI={att:'📎',mic:'🎤',send:'➤',rnew:'＋',rch:'📢',rsr:'🔍',rord:'⇅',rset:'⚙'};
+const frameOf=id=>{const w=wal[id],it=w&&w.eq&&shopItems[w.eq.frame];return it&&it.type==='frame'&&(w.owned||[]).includes(w.eq.frame)?it:null};
+let spT=null;
+function splash(on){const e=$('splash');e.hidden=!on;clearInterval(spT);if(on){let i=0;const f=()=>$('sptxt').textContent=t('ld'+(i++%4+1));f();spT=setInterval(f,1300)}}
+async function resolveAcc(c){let a=await ids(c);if(c.length===32){try{const al=await getDoc(doc(db,'aliases',a));if(al.exists())a=al.data().acc}catch(e){}}return a}
+function refresh(){renderShop();applyEquip();renderWall();draw();renderRooms();renderOwn()}
+function applyEquip(){const w=wal[acc]||{},eq=w.eq||{},own=w.owned||[],g=k=>{const it=shopItems[eq[k]];return it&&own.includes(eq[k])?it:null};
+ const ic=g('icons');Object.keys(DI).forEach(k=>{const e=$(k);if(e)e.textContent=(ic&&ic.data.pack&&ic.data.pack[k])||DI[k]});
+ const bt=g('buttons'),r=document.documentElement.style;if(bt){r.setProperty('--pri',bt.data.c);r.setProperty('--rad',bt.data.r+'px')}else{r.removeProperty('--pri');r.removeProperty('--rad')}}
+function pv(it){const d=document.createElement('div');d.className='pv';const x=it.data||{};
+ if(it.type==='sticker'){if(x.img)d.append(Object.assign(document.createElement('img'),{src:x.img}));else d.textContent=x.emoji||'⭐'}
+ else if(it.type==='frame'){const w=document.createElement('span'),a=document.createElement('span');w.className='fw';a.className='av big';a.textContent='?';
+  if(x.img){w.style.padding='0';w.append(a,Object.assign(document.createElement('img'),{src:x.img,className:'fo'}))}else{w.style.background=FR[x.preset]||FR.gold;w.append(a)}d.append(w)}
+ else if(it.type==='icons'){d.style.fontSize='18px';d.textContent=Object.values(x.pack||{}).slice(0,5).join(' ')}
+ else{const b=document.createElement('button');b.className='pri';b.textContent='Button';b.style.background=x.c;b.style.borderRadius=x.r+'px';d.append(b)}
+ return d}
+async function buy(id){const it=shopItems[id],w=wal[acc]||{coins:0,owned:[]};if((w.coins||0)<it.price)return alert(t('nocoin'));
+ try{await updateDoc(doc(db,'wallet',acc),{coins:w.coins-it.price,owned:[...(w.owned||[]),id]})}catch(e){alert(e.code)}}
+const equip=(type,id)=>updateDoc(doc(db,'wallet',acc),{eq:{...((wal[acc]||{}).eq||{}),[type]:id}}).catch(e=>alert(e.code));
+async function redeem(code){code=code.trim();const m=$('pmsg');m.textContent='';if(!/^[A-Za-z0-9_-]{3,40}$/.test(code))return m.textContent=t('promobad');
+ try{const pr=doc(db,'promos',code),ps=await getDoc(pr);if(!ps.exists())return m.textContent=t('promobad');const p=ps.data(),w=wal[acc]||{coins:0};
+  if((p.by||[]).includes(acc)||p.used>=p.max)return m.textContent=t('promobad');
+  const b=writeBatch(db);b.update(pr,{used:p.used+1,by:arrayUnion(acc)});b.update(doc(db,'wallet',acc),{coins:(w.coins||0)+p.coins,lp:code});await b.commit();$('pcode').value='';m.textContent='+'+p.coins+' 💰'}
+ catch(e){m.textContent=t('promobad')+' ['+(e.code||'')+']'}}
+function buildShop(){const b=$('shop');b.innerHTML='<div class="card"><h3 id="coins"></h3><p><input type="text" id="pcode"></p><button class="pri" id="predeem"></button> <span id="pmsg"></span></div><div class="card"><h3></h3><div class="grid" id="sgrid"></div></div>';
+ b.querySelectorAll('h3')[1].textContent=t('shop');$('pcode').placeholder=t('promo');$('predeem').textContent=t('redeem');$('predeem').onclick=()=>redeem($('pcode').value)}
+function renderShop(){const g=$('sgrid');if(!g)return;const w=wal[acc]||{coins:0,owned:[],eq:{}};$('coins').textContent='💰 '+(w.coins||0)+' femboy coins';g.innerHTML='';
+ Object.entries(shopItems).filter(([,it])=>it.on!==false).sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,it])=>{const c=document.createElement('div');c.className='item';c.append(pv(it));
+  const n=document.createElement('div');n.innerHTML='<b></b><div class="hint"></div>';n.children[0].textContent=it.name;n.children[1].textContent=t('ty_'+it.type)+' · '+it.price+' 💰';c.append(n);
+  const own=(w.owned||[]).includes(id),b=document.createElement('button');
+  if(!own){b.className='pri';b.textContent=t('buy');b.onclick=()=>buy(id)}
+  else if(it.type==='sticker'){b.textContent=t('owned');b.disabled=true}
+  else{const on=(w.eq||{})[it.type]===id;b.textContent=on?t('unequip'):t('equip');b.onclick=()=>equip(it.type,on?'':id)}
+  c.append(b);g.append(c)})}
+let LS=[],selS=-1;
+const saveStk=()=>updateDoc(doc(db,'wallet',acc),{stk:LS}).catch(e=>alert(e.code));
+function wallEl(stk,id,edit){const wl=document.createElement('div');wl.className='wall';const th=(users[id]||{}).theme;if(th&&th.bg)wl.style.background=rgb(th.bg);const own=(wal[id]||{}).owned||[];
+ stk.forEach((st,i)=>{const it=shopItems[st.i];if(!it||it.type!=='sticker'||!own.includes(st.i))return;
+  const e=document.createElement('div');e.className='stk'+(edit&&i===selS?' sel':'');e.style.left=st.x+'%';e.style.top=st.y+'%';e.style.width=st.s+'%';
+  if(it.data.img)e.append(Object.assign(document.createElement('img'),{src:it.data.img}));else{e.textContent=it.data.emoji||'⭐';e.style.fontSize=(st.s*.8)+'cqw';e.style.width='auto'}
+  if(edit)e.onpointerdown=ev=>{selS=i;wl.querySelectorAll('.stk').forEach(x=>x.classList.remove('sel'));e.classList.add('sel');e.setPointerCapture(ev.pointerId);const R=wl.getBoundingClientRect();
+   e.onpointermove=m=>{st.x=Math.max(0,Math.min(100,(m.clientX-R.left)/R.width*100));st.y=Math.max(0,Math.min(100,(m.clientY-R.top)/R.height*100));e.style.left=st.x+'%';e.style.top=st.y+'%'};
+   e.onpointerup=()=>{e.onpointermove=e.onpointerup=null;saveStk()}};
+  wl.append(e)});return wl}
+function renderWall(){const c=$('wedit');if(!c||!acc)return;c.innerHTML='';const w=wal[acc]||{owned:[],stk:[]};LS=structuredClone(w.stk||[]);c.append(wallEl(LS,acc,true));
+ const bar=document.createElement('p');bar.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:8px';
+ (w.owned||[]).filter(id=>shopItems[id]&&shopItems[id].type==='sticker').forEach(id=>{const b=document.createElement('button'),p=pv(shopItems[id]);p.style.cssText='height:32px;font-size:22px';const im=p.querySelector('img');if(im)im.style.maxHeight='32px';b.append(p);b.onclick=()=>{if(LS.length>=12)return;LS.push({i:id,x:50,y:50,s:30});selS=LS.length-1;saveStk()};bar.append(b)});
+ [['−',-4],['+',4]].forEach(([l,d])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{const st=LS[selS];if(st){st.s=Math.max(8,Math.min(80,st.s+d));saveStk()}};bar.append(b)});
+ const x=document.createElement('button');x.textContent='✕';x.onclick=()=>{if(LS[selS]){LS.splice(selS,1);selS=-1;saveStk()}};bar.append(x);c.append(bar)}
+function extra(id){const x=document.createElement('div'),W=wal[id]||{coins:0,owned:[]},u=users[id]||{},l1=document.createElement('p');l1.textContent='💰 '+(W.coins||0)+' femboy coins';x.append(l1);
+ if(u.theme){const l=document.createElement('p');l.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap';l.append(t('colors')+': ');
+  ['bg','tx','ac'].forEach(k=>{const a=u.theme[k];if(!a)return;const s=document.createElement('span'),sw=document.createElement('i');s.style.cssText='display:inline-flex;gap:4px;align-items:center;font-size:12px';
+   sw.style.cssText='width:18px;height:18px;border-radius:5px;border:1px solid var(--bd);background:'+rgb(a);s.append(sw,'#'+a.map(v=>v.toString(16).padStart(2,'0')).join(''));l.append(s)});x.append(l)}
+ const its=(W.owned||[]).map(i=>shopItems[i]).filter(Boolean);if(its.length){const p=document.createElement('p');p.textContent=t('bought')+': '+its.map(i=>i.name).join(', ');x.append(p)}
+ x.append(wallEl(W.stk||[],id,false));return x}
+async function cropTool(file){const img=new Image();img.src=URL.createObjectURL(file);await img.decode();
+ const c0=document.createElement('canvas');c0.width=img.width;c0.height=img.height;const x0=c0.getContext('2d',{willReadFrequently:true});x0.drawImage(img,0,0);
+ const dt=x0.getImageData(0,0,c0.width,c0.height).data;let L=c0.width,T=c0.height,R=-1,B=-1;
+ for(let y=0;y<c0.height;y++)for(let x=0;x<c0.width;x++)if(dt[(y*c0.width+x)*4+3]>12){if(x<L)L=x;if(x>R)R=x;if(y<T)T=y;if(y>B)B=y}
+ if(R<0){L=0;T=0;R=c0.width-1;B=c0.height-1}const sw=R-L+1,sh=B-T+1;
+ return new Promise(res=>{const d=$('cr');d.innerHTML='<h3></h3><canvas id="cv" width="256" height="256" style="width:100%;border:1px solid var(--bd);border-radius:8px"></canvas><p><label>Zoom <input type="range" id="crz" min="40" max="300" value="100"></label></p><p><label>X <input type="range" id="crx" min="-100" max="100" value="0"></label></p><p><label>Y <input type="range" id="cry" min="-100" max="100" value="0"></label></p><p><button class="pri" id="crok"></button> <button id="crno"></button></p>';
+  d.querySelector('h3').textContent=t('crop');$('crok').textContent=t('done');$('crno').textContent=t('cancel');
+  const cv=$('cv'),g=cv.getContext('2d'),dr=()=>{g.clearRect(0,0,256,256);const k=Math.min(256/sw,256/sh)*$('crz').value/100,w=sw*k,h=sh*k;g.drawImage(c0,L,T,sw,sh,(256-w)/2+$('crx').value*1.28,(256-h)/2+$('cry').value*1.28,w,h)};
+  ['crz','crx','cry'].forEach(i=>$(i).oninput=dr);dr();
+  $('crok').onclick=()=>{const o=cv.toDataURL('image/png');d.close();if(o.length>700000){alert('Too big');res(null)}else res(o)};$('crno').onclick=()=>{d.close();res(null)};d.onclose=()=>res(null);d.showModal()})}
+let fd={};
+function renderSdata(){const k=$('sty').value,x=$('sdata');x.innerHTML='';fd={img:''};
+ const inp=(ph,id,v)=>{const p=document.createElement('p'),i=document.createElement('input');i.type='text';i.id=id;i.placeholder=ph;i.value=v||'';p.append(i);x.append(p)};
+ const upl=()=>{const p=document.createElement('p'),b=document.createElement('button'),pr=document.createElement('img'),f=document.createElement('input');pr.style.cssText='max-height:64px;vertical-align:middle;margin-left:8px';b.textContent=t('upimg');f.type='file';f.accept='image/*';f.hidden=true;
+  b.onclick=()=>f.click();f.onchange=async()=>{if(f.files[0]){const o=await cropTool(f.files[0]);f.value='';if(o){fd.img=o;pr.src=o}}};p.append(b,f,pr);x.append(p)};
+ if(k==='sticker'){inp('Emoji','sem');upl()}
+ else if(k==='frame'){const p=document.createElement('p'),s2=document.createElement('select');s2.id='sfr';Object.keys(FR).forEach(n=>s2.add(new Option(n,n)));p.append(s2);x.append(p);upl()}
+ else if(k==='icons')inp(t('iconhint'),'sic','📎 🎤 ➤ ＋ 📢 🔍 ⇅ ⚙');
+ else{inp('#ff66aa','sbc','#ff66aa');inp('radius px','sbr','20')}}
+function buildOwn(){const b=$('own');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="pc"></p><p><input type="text" id="pn"></p><p><input type="text" id="pm"></p><p><button id="pg"></button> <button class="pri" id="pk"></button> <span id="pr"></span></p><div id="plist"></div></div><div class="card"><h3></h3><p><select id="sty"><option value="sticker"></option><option value="frame"></option><option value="icons"></option><option value="buttons"></option></select></p><p><input type="text" id="snm"></p><p><input type="text" id="spr"></p><div id="sdata"></div><p><button class="pri" id="sadd"></button> <span id="sres2"></span></p><div id="solist"></div></div>';
+ const hs=b.querySelectorAll('h3');hs[0].textContent=t('promos');hs[1].textContent=t('ownshop');
+ $('pc').placeholder=t('pcode');$('pn').placeholder=t('pcoins');$('pm').placeholder=t('pmax');$('pg').textContent=t('gen');$('pk').textContent=t('create');
+ ['sticker','frame','icons','buttons'].forEach((k,i)=>b.querySelectorAll('#sty option')[i].textContent=t('ty_'+k));$('snm').placeholder=t('chname');$('spr').placeholder=t('priceph');$('sadd').textContent=t('add');
+ $('pg').onclick=()=>$('pc').value=gen(10);
+ $('pk').onclick=async()=>{const c=$('pc').value.trim(),n=+$('pn').value,m=+$('pm').value;if(!/^[A-Za-z0-9_-]{3,40}$/.test(c)||!(n>0)||!(m>0))return $('pr').textContent=t('need');
+  try{await setDoc(doc(db,'promos',c),{coins:n,max:m,used:0,by:[],ts:Date.now()});$('pr').textContent=t('added');$('pc').value=$('pn').value=$('pm').value=''}catch(e){$('pr').textContent=e.code}};
+ $('sty').onchange=renderSdata;renderSdata();
+ $('sadd').onclick=async()=>{const k=$('sty').value,name=$('snm').value.trim(),price=+$('spr').value,m=$('sres2');if(!name||!(price>=0)||$('spr').value==='')return m.textContent=t('need');let data;
+  if(k==='sticker'){data={emoji:$('sem').value.trim(),img:fd.img||''};if(!data.emoji&&!data.img)return m.textContent=t('need')}
+  else if(k==='frame')data={preset:$('sfr').value,img:fd.img||''};
+  else if(k==='icons'){const a=$('sic').value.trim().split(/\s+/);data={pack:Object.fromEntries(Object.keys(DI).map((n,i)=>[n,a[i]||DI[n]]))}}
+  else{const c=$('sbc').value.trim();if(!/^#[0-9a-f]{6}$/i.test(c))return m.textContent='#RRGGBB';data={c,r:+$('sbr').value||10}}
+  try{await addDoc(collection(db,'shop'),{type:k,name,price,data,ts:Date.now(),on:true});$('snm').value=$('spr').value='';renderSdata();m.textContent=t('added')}catch(e){m.textContent=e.code}};
+ renderOwn()}
+function renderOwn(){const pl=$('plist');if(!pl)return;pl.innerHTML='';
+ promos.forEach(p=>{const r=document.createElement('div'),s2=document.createElement('span'),x=document.createElement('button');r.className='ur';s2.textContent=p.id+' — '+p.coins+'💰 · '+p.used+'/'+p.max;x.textContent='✕';x.onclick=()=>deleteDoc(doc(db,'promos',p.id)).catch(e=>alert(e.code));r.append(s2,x);pl.append(r)});
+ const so=$('solist');so.innerHTML='';
+ Object.entries(shopItems).forEach(([id,it])=>{const r=document.createElement('div'),s2=document.createElement('span'),e=document.createElement('button'),x=document.createElement('button');r.className='ur';s2.textContent=t('ty_'+it.type)+': '+it.name+' — '+it.price+'💰';e.textContent='✎';
+  e.onclick=()=>{const v=prompt(t('priceph'),it.price);if(v!==null&&v!==''&&+v>=0)updateDoc(doc(db,'shop',id),{price:+v}).catch(er=>alert(er.code))};
+  x.textContent='✕';x.onclick=()=>{if(confirm(t('del')+'?'))deleteDoc(doc(db,'shop',id)).catch(er=>alert(er.code))};r.append(s2,e,x);so.append(r)})}
+async function addAdmin(){const n=prompt(t('admname'));if(!n)return;const c=gen(44),id=await ids(c),pf=await prf(c,'','');
+ const b=writeBatch(db);b.set(doc(db,'staff',id),{name:n.trim(),role:'admin',ts:Date.now()});b.set(doc(db,'staffsec',id),{proof:pf});await b.commit();
+ const d=$('dlg');d.innerHTML='<h3></h3><p class="hint"></p><p><input type="text" id="nc" readonly style="font-family:monospace"></p><p><button id="ncc"></button> <button class="pri" id="ncx"></button></p>';
+ d.querySelector('h3').textContent=t('newadm')+': '+n;d.querySelector('.hint').textContent=t('savecode');$('nc').value=c;$('ncc').textContent=t('copy');$('ncc').onclick=()=>navigator.clipboard.writeText(c);$('ncx').textContent=t('close');$('ncx').onclick=()=>d.close();d.showModal()}
+function delAdmin(id){if(!confirm(t('del')+'?'))return Promise.resolve();const b=writeBatch(db);b.delete(doc(db,'staff',id));b.delete(doc(db,'staffsec',id));return b.commit()}
+function codeDlg(r){const d=$('dlg');d.innerHTML='<h3></h3><p><input type="text" id="kc" style="font-family:monospace"></p><p><button id="kg"></button></p><p><input type="text" id="kn"></p><p><input type="text" id="kp"></p><p><button class="pri" id="kok"></button> <button id="kx"></button> <span id="kres"></span></p>';
+ d.querySelector('h3').textContent=t('chcode')+': '+r.name;$('kc').placeholder=t('newcodel');$('kg').textContent=t('gen');$('kn').placeholder=t('name');$('kp').placeholder=t('pass');$('kok').textContent=t('save');$('kx').textContent=t('close');
+ $('kg').onclick=()=>$('kc').value=gen(32);$('kx').onclick=()=>d.close();
+ $('kok').onclick=async()=>{const c=$('kc').value.trim(),n=$('kn').value.trim(),p=$('kp').value,m=x=>$('kres').textContent=x;if(c.length!==32||!n||!p)return m(t('need2'));
+  try{const na=await ids(c);if(na!==r.id&&((await getDoc(doc(db,'aliases',na))).exists()||(await getDoc(doc(db,'accounts',na))).exists()))return m(t('codeused'));
+   const b=writeBatch(db);b.update(doc(db,'accounts',r.id),{proof:await prf(c,n,p),name:n});if(na!==r.id)b.set(doc(db,'aliases',na),{acc:r.id});await b.commit();m(t('codechd'))}catch(e){m(e.code||e.message)}};d.showModal()}
+function renderSup(){const l=$('slist');if(!l)return;l.innerHTML='';if(!threads.length)l.textContent=t('nosup');
+ threads.forEach(th=>{const row=document.createElement('div'),s2=document.createElement('span'),b=document.createElement('button'),x=document.createElement('button');row.className='ur';
+  s2.textContent='💬 '+(th.name||'?')+' — '+(th.claimedBy?(th.claimName||'…'):t('free'));b.className=th.claimedBy?'':'pri';b.textContent=t('open');b.onclick=()=>openSupport(th.id,true);
+  x.textContent='✕';x.onclick=()=>{if(confirm(t('del')+'?'))deleteDoc(doc(db,'support',th.id)).catch(e=>alert(e.code))};row.append(s2,b,x);l.append(row)})}
+function openSupport(tid,sv){const d=$('dlg');d.innerHTML='<h3></h3><p class="hint" id="ss"></p><div id="sm" style="height:260px;overflow:auto;border:1px solid var(--bd);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:4px"></div><p style="display:flex;gap:6px"><input type="text" id="st"><button class="pri" id="ssend">➤</button></p><p><button id="scode"></button> <button id="sfill"></button> <button id="sclose"></button> <span id="sres"></span></p>';
+ const tref=doc(db,'support',tid),nm0=sv?'':($('lname').value.trim()||localStorage.nm||(me&&me.displayName)||'Guest');let th=null;
+ d.querySelector('h3').textContent=t('supp');$('st').placeholder=t('msg');$('scode').textContent=t('sendcode');$('sfill').textContent=t('tofill');$('sclose').textContent=t('close');$('sclose').onclick=()=>d.close();
+ $('scode').hidden=sv||!!acc||$('code').value.length!==32;$('sfill').hidden=!sv;
+ const u1=onSnapshot(tref,s=>{th=s.exists()?s.data():null;if(sv&&th&&!th.claimedBy&&!isTop())updateDoc(tref,{claimedBy:acc,claimName:me.displayName}).catch(()=>{});
+  const can=!sv||isTop()||(th&&th.claimedBy===acc);$('st').disabled=$('ssend').disabled=!can;$('ss').textContent=th&&th.claimedBy?t('handledby')+' '+th.claimName:(sv?'':t('wait'))},()=>{});
+ const u2=onSnapshot(query(collection(db,'support',tid,'msgs'),orderBy('ts')),s=>{const m=$('sm');m.innerHTML='';s.docs.forEach(x=>{const v=x.data(),e=document.createElement('div');e.className='m'+((v.from==='staff')===sv?' me':'');e.textContent=(v.name?v.name+': ':'')+v.text;m.append(e)});m.scrollTop=m.scrollHeight},()=>{});
+ d.onclose=()=>{u1();u2()};
+ const send=async txt=>{try{const nm=sv?me.displayName:nm0,code=$('code').value;
+   if(sv||th)await updateDoc(tref,{last:Date.now()});else await setDoc(tref,{name:nm,code:(!acc&&code.length===32)?code:'',ts:Date.now(),claimedBy:'',claimName:'',last:Date.now()});
+   await addDoc(collection(db,'support',tid,'msgs'),{from:sv?'staff':'user',text:txt,name:nm,ts:Date.now()});$('st').value=''}catch(e){$('sres').textContent=e.code||e.message}};
+ $('ssend').onclick=()=>{const v=$('st').value.trim();if(v)send(v)};$('scode').onclick=()=>send(t('mycode')+': '+$('code').value);
+ $('sfill').onclick=()=>{if(th){$('ac').value=th.code||'';$('an').value=th.name||''}d.close();tab('adm')};d.showModal()}
+$('sup').onclick=()=>fu&&openSupport(fu.uid,false);$('supbtn').onclick=()=>fu&&openSupport(fu.uid,false);
 async function start(a,nm){
  try{if((await getDoc(doc(db,'blocked',a))).exists()){await logout();$('err').textContent=t('blockedm');return}}catch(e){}
- acc=a;role=a===OWNER?'owner':ADMINS.includes(a)?'admin':'user';
- me={uid:a,displayName:nm||(role==='owner'?'Owner':role==='admin'?'Admin':'User')};
- $('login').hidden=true;['tChat','tProf','out'].forEach(i=>$(i).hidden=false);$('tAdm').hidden=role==='user';$('credcard').hidden=role!=='user';
- P={name:me.displayName,avatar:'',bio:'',theme:structuredClone(DEF)};
+ first=new Promise(r=>firstRes=r);let dyn=false;try{dyn=(await getDoc(doc(db,'staff',a))).exists()}catch(e){}
+ acc=a;role=a===OWNER?'owner':a===CHIEF?'chief':(ADMINS.includes(a)||dyn)?'admin':'user';
+ me={uid:a,displayName:nm||(role==='owner'?'Owner':role==='chief'?'Chief':role==='admin'?'Admin':'User')};
+ $('login').hidden=true;['tChat','tProf','tShop','out'].forEach(i=>$(i).hidden=false);$('tAdm').hidden=role==='user';$('tOwn').hidden=role!=='owner';$('credcard').hidden=role!=='user';
+ P={_id:a,name:me.displayName,avatar:'',bio:'',theme:structuredClone(DEF)};
  const u=doc(db,'users',a),E=()=>{},bad=e=>{if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))};
  getDoc(u).then(s=>{if(!s.exists())setDoc(u,{name:me.displayName})}).catch(E);
  subs=[onSnapshot(u,s=>{if(s.exists()&&!P._l){P={...P,...s.data(),_l:1};if(P.lang&&T[P.lang]){L=P.lang;localStorage.lang=L;i18n()}}applyTheme(P.theme);renderProf()},E),
-  onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]=d.data());draw();renderAdm();renderRooms()},E),
+  onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]={...d.data(),_id:d.id});draw();renderAdm();renderRooms();firstRes()},E),
   onSnapshot(query(collection(db,'rooms'),where('members','array-contains',a)),s=>{myRooms=s.docs.map(d=>({id:d.id,...d.data()}));if(cur.id!=='global'&&!myRooms.find(r=>r.id===cur.id))subRoom({id:'global',type:'global'});else renderRooms();watch()},denied),onSnapshot(query(collection(db,'rooms'),where('type','==','channel')),s=>{chans=s.docs.map(d=>({id:d.id,...d.data()}))},E),
   onSnapshot(doc(db,'mutes',a),s=>{muteUntil=s.exists()?s.data().until:0;$('txt').placeholder=Date.now()<muteUntil?t('muted'):t('msg')},E)];
+ subs.push(onSnapshot(collection(db,'wallet'),s=>{wal={};s.docs.forEach(d=>wal[d.id]=d.data());refresh()},E),onSnapshot(collection(db,'shop'),s=>{shopItems={};s.docs.forEach(d=>shopItems[d.id]=d.data());refresh()},E),onSnapshot(collection(db,'staff'),s=>{staffD={};s.docs.forEach(d=>staffD[d.id]=d.data());renderAdm();draw()},E));
+ getDoc(doc(db,'wallet',a)).then(s=>{if(!s.exists())setDoc(doc(db,'wallet',a),{coins:0,owned:[],eq:{},stk:[]})}).catch(E);
+ buildShop();if(role==='owner'){buildOwn();subs.push(onSnapshot(collection(db,'promos'),s=>{promos=s.docs.map(d=>({id:d.id,...d.data()}));renderOwn()},E))}
  if(role!=='user'){buildAdm();subs.push(onSnapshot(collection(db,'accounts'),s=>{accs=s.docs.map(d=>({id:d.id,...d.data()}));renderAdm()},E),
   onSnapshot(collection(db,'blocked'),s=>{bl=new Set(s.docs.map(d=>d.id));renderAdm()},E),
-  onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E))}
+  onSnapshot(collection(db,'mutes'),s=>{mu={};s.docs.forEach(d=>mu[d.id]=d.data().until);renderAdm()},E),onSnapshot(query(collection(db,'support'),orderBy('last','desc')),s=>{threads=s.docs.map(d=>({id:d.id,...d.data()}));renderSup()},E))}
  getDoc(doc(db,'galleries',a)).then(s=>{G=s.exists()?s.data().photos||[]:[];renderGal()}).catch(E);
- subRoom({id:'global',type:'global'});renderGal();tab('prof')}
+ subRoom({id:'global',type:'global'});renderGal();await Promise.race([first,new Promise(r=>setTimeout(r,12000))]);applyEquip();splash(false);tab('prof')}
 newCode();
 try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true},DBID);
  $('diag').onclick=async()=>{$('err').textContent='…';const o=['проект: '+firebaseConfig.projectId,'вход: '+(fu?'ok':'нет')];
@@ -337,11 +489,11 @@ try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=initializeFires
  $('gbtn').onclick=async()=>{const c=$('code').value.trim(),n=$('lname').value,p=$('lpass').value;$('err').textContent='';
   if(!fu)return $('err').textContent='Нет подключения к Firebase, подождите и обновите страницу (Ctrl+F5)';if(c.length!==32&&c.length<44)return $('err').textContent=t('badcode');
   if(c.length<44&&(!n.trim()||!p))return $('err').textContent=t('need');
-  $('err').textContent='…';try{const a=await ids(c);await Promise.race([setDoc(doc(db,'sessions',fu.uid),{acc:a,proof:await prf(c,n,p)}),new Promise((_,r)=>setTimeout(()=>r({code:'timeout: нет связи с базой, отключите VPN/блокировщик рекламы'}),12000))]);$('err').textContent='';localStorage.nm=n.trim();if(c===localStorage.nc)localStorage.removeItem('nc');$('lpass').value='';await start(a,n.trim())}
-  catch(e){$('err').textContent=t('denied')+' ['+(e.code||e.message)+']'}};
- onAuthStateChanged(auth,async u=>{if(!u){signInAnonymously(auth).catch(e=>$('err').textContent=e.code);return}
+  $('err').textContent='';splash(true);try{const a=await resolveAcc(c);await Promise.race([setDoc(doc(db,'sessions',fu.uid),{acc:a,proof:await prf(c,n,p)}),new Promise((_,r)=>setTimeout(()=>r({code:'timeout: нет связи с базой, отключите VPN/блокировщик рекламы'}),12000))]);$('err').textContent='';localStorage.nm=n.trim();if(c===localStorage.nc)localStorage.removeItem('nc');$('lpass').value='';await start(a,n.trim())}
+  catch(e){splash(false);$('err').textContent=t('denied')+' ['+(e.code||e.message)+']'}};
+ onAuthStateChanged(auth,async u=>{if(!u){signInAnonymously(auth).catch(e=>{splash(false);$('err').textContent=e.code});return}
   fu=u;try{const s=await Promise.race([getDoc(doc(db,'sessions',u.uid)),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),7000))]);if(s.exists()){await start(s.data().acc,localStorage.nm);return}}catch(e){}
   showLogin()})}
-catch(e){$('err').textContent='Firebase: '+e.message}
+catch(e){splash(false);$('err').textContent='Firebase: '+e.message}
 i18n();
 </script></body></html>
