@@ -64,7 +64,7 @@ dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-ra
 .stk{position:absolute;touch-action:none;transform:translate(-50%,-50%);user-select:none;line-height:1}.stk img{width:100%;display:block;pointer-events:none}.stk.sel{outline:2px dashed var(--ac)}
 #cv{background:repeating-conic-gradient(#8885 0 25%,transparent 0 50%) 0 0/16px 16px}
 @supports(height:100dvh){html,body,#app{height:100dvh}}
-#prof{display:block!important;position:relative;overflow:hidden!important;padding:0!important;min-height:0}
+#prof:not([hidden]){display:block!important}#prof{position:relative;overflow:hidden!important;padding:0!important;min-height:0}
 #pscroll{height:100%;overflow:auto;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
 #chat{position:relative;overflow:hidden;flex-direction:column!important}#cmain{flex:1;width:100%}
 #rbar,#fdr{position:absolute!important;z-index:30;background:var(--bg);display:flex!important;flex-direction:column!important;overflow:auto;padding:8px;gap:6px;transition:transform .25s ease;border:0!important;box-shadow:none}
@@ -80,6 +80,9 @@ textarea{font-size:16px;min-height:44px;max-height:120px}input[type=text],input[
 .rx .tl{display:none}.bub.show .rx .tl,.bub:hover .rx .tl{display:inline-block}
 @media(max-width:700px){#pscroll{grid-template-columns:1fr}.m{max-width:92%}nav{gap:4px}nav button{padding:8px}}
 .rrow{flex-wrap:wrap}.rrow .ri{min-width:90px}
+.pv .fo{max-width:none;max-height:none}.pv .fw .av{width:48px;height:48px;font-size:20px}
+#spv{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;padding:12px;border:1px dashed var(--bd);border-radius:12px;min-height:80px;margin-bottom:8px}
+#spv .cap{font-size:11px;opacity:.7;text-align:center;margin-top:4px}#spv .col{display:flex;flex-direction:column;align-items:center}
 </style></head><body>
 <div id="splash"><div style="font-size:22px">🏳️‍⚧️ Фембойский чатик 🏳️‍⚧️</div><div class="spin"></div><div id="sptxt"></div></div>
 <div id="app">
@@ -157,6 +160,8 @@ Object.assign(T.ru,{rchats:"Чаты",friends:"Друзья",newreq:"запро�
 Object.assign(T.en,{rchats:"Chats",friends:"Friends",newreq:"requests",accept:"Accept",decline:"Decline",cancelreq:"Request sent · Cancel",addfr:"Add friend",unfriend:"Remove friend",nofr:"No friends yet. Find people with 🔍 and send a request",nofrchat:"Add the person as a friend first",incoming:"Incoming requests",outgoing:"Outgoing requests"});
 Object.assign(T.ru,{arch:"Архив",toarch:"В архив",unarch:"Из архива",hideme:"Удалить у себя",archempty:"В архиве пусто",purge:"Очистить профили удалённых",purged:"Удалено профилей:",nopurge:"Нечего чистить"});
 Object.assign(T.en,{arch:"Archive",toarch:"Archive",unarch:"Unarchive",hideme:"Delete for me",archempty:"Archive is empty",purge:"Clean up deleted profiles",purged:"Profiles removed:",nopurge:"Nothing to clean"});
+Object.assign(T.ru,{limit:"Достигнут лимит покупок",limph:"Лимит покупок на одного человека",frscale:"Размер рамки",prev:"Предпросмотр",wait2:"Кошелёк загружается, попробуйте ещё раз",buyfail:"Не удалось купить",pvprof:"Профиль",pvchat:"Чат",pvlist:"Список"});
+Object.assign(T.en,{limit:"Purchase limit reached",limph:"Purchase limit per person",frscale:"Frame size",prev:"Preview",wait2:"Wallet is loading, try again",buyfail:"Purchase failed",pvprof:"Profile",pvchat:"Chat",pvlist:"List"});
 const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
 let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
 if(!T[L])L='en';
@@ -176,11 +181,7 @@ function loadGT(){if(window.google&&google.translate)return;window.gtInit=()=>ne
  const s=document.createElement('script');s.src='https://translate.google.com/translate_a/element.js?cb=gtInit';document.head.append(s)}
 function avatar(u,big){const e=u&&u.avatar?Object.assign(document.createElement('img'),{src:u.avatar}):document.createElement('span');
  e.className='av'+(big?' big':'');if(!(u&&u.avatar))e.textContent=((u&&u.name)||'?')[0].toUpperCase();
- const f=u&&u._id&&frameOf(u._id);if(!f)return e;
- const w=document.createElement('span');w.className='fw';
- if(f.data.img){w.style.padding='0';w.append(e,Object.assign(document.createElement('img'),{src:f.data.img,className:'fo'}))}
- else{w.style.background=FR[f.data.preset]||FR.gold;w.append(e)}
- return w}
+ const f=u&&u._id&&frameOf(u._id);if(!f)return e;return frameWrap(e,f)}
 // --- RGB panel ---
 function buildRGB(){const box=$('rgb');box.innerHTML='';const hx=a=>'#'+a.map(v=>v.toString(16).padStart(2,'0')).join('');
  ['bg','tx','ac'].forEach(k=>{const w=document.createElement('div');w.innerHTML=`<b>${t(k)}</b><div class="sw"></div><input type="text" class="hx" maxlength="7" placeholder="#RRGGBB">`;
@@ -392,13 +393,16 @@ function applyEquip(){const w=wal[acc]||{},eq=w.eq||{},own=w.owned||[],g=k=>{con
  const bt=g('buttons'),r=document.documentElement.style;if(bt){r.setProperty('--pri',bt.data.c);r.setProperty('--rad',bt.data.r+'px')}else{r.removeProperty('--pri');r.removeProperty('--rad')}}
 function pv(it){const d=document.createElement('div');d.className='pv';const x=it.data||{};
  if(it.type==='sticker'){if(x.img)d.append(Object.assign(document.createElement('img'),{src:x.img}));else d.textContent=x.emoji||'⭐'}
- else if(it.type==='frame'){const w=document.createElement('span'),a=document.createElement('span');w.className='fw';a.className='av big';a.textContent='?';
-  if(x.img){w.style.padding='0';w.append(a,Object.assign(document.createElement('img'),{src:x.img,className:'fo'}))}else{w.style.background=FR[x.preset]||FR.gold;w.append(a)}d.append(w)}
+ else if(it.type==='frame'){const a=document.createElement('span');a.className='av';a.textContent='A';d.append(frameWrap(a,it))}
  else if(it.type==='icons'){d.style.fontSize='18px';d.textContent=Object.values(x.pack||{}).slice(0,5).join(' ')}
  else{const b=document.createElement('button');b.className='pri';b.textContent='Button';b.style.background=x.c;b.style.borderRadius=x.r+'px';d.append(b)}
  return d}
-async function buy(id){const it=shopItems[id],w=wal[acc]||{coins:0,owned:[]};if((w.coins||0)<it.price)return alert(t('nocoin'));
- try{await updateDoc(doc(db,'wallet',acc),{coins:w.coins-it.price,owned:[...(w.owned||[]),id]})}catch(e){alert(e.code)}}
+const smsg=m=>{const e=$('pmsg');if(e)e.textContent=m;else alert(m)};
+async function buy(id){const it=shopItems[id],w=wal[acc];if(!it||!w)return smsg(t('wait2'));
+ const own=(w.owned||[]).includes(id),n=((w.cnt||{})[id])||(own?1:0),lim=it.lim||1;
+ if(n>=lim)return smsg(t('limit'));if((w.coins||0)<it.price)return smsg(t('nocoin'));
+ try{await updateDoc(doc(db,'wallet',acc),{coins:w.coins-it.price,owned:own?w.owned:[...(w.owned||[]),id],cnt:{...(w.cnt||{}),[id]:n+1},bp:id});smsg('')}
+ catch(e){smsg(t('buyfail')+' ['+(e.code||e.message)+']');console.error(e)}}
 const equip=(type,id)=>updateDoc(doc(db,'wallet',acc),{eq:{...((wal[acc]||{}).eq||{}),[type]:id}}).catch(e=>alert(e.code));
 async function redeem(code){code=code.trim();const m=$('pmsg');m.textContent='';if(!/^[A-Za-z0-9_-]{3,40}$/.test(code))return m.textContent=t('promobad');
  try{const pr=doc(db,'promos',code),ps=await getDoc(pr);if(!ps.exists())return m.textContent=t('promobad');const p=ps.data(),w=wal[acc]||{coins:0};
@@ -409,9 +413,10 @@ function buildShop(){const b=$('shop');b.innerHTML='<div class="card"><h3 id="co
  b.querySelectorAll('h3')[1].textContent=t('shop');$('pcode').placeholder=t('promo');$('predeem').textContent=t('redeem');$('predeem').onclick=()=>redeem($('pcode').value)}
 function renderShop(){const g=$('sgrid');if(!g)return;const w=wal[acc]||{coins:0,owned:[],eq:{}};$('coins').textContent='💰 '+(w.coins||0)+' femboy coins';g.innerHTML='';
  Object.entries(shopItems).filter(([,it])=>it.on!==false).sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,it])=>{const c=document.createElement('div');c.className='item';c.append(pv(it));
-  const n=document.createElement('div');n.innerHTML='<b></b><div class="hint"></div>';n.children[0].textContent=it.name;n.children[1].textContent=t('ty_'+it.type)+' · '+it.price+' 💰';c.append(n);
-  const own=(w.owned||[]).includes(id),b=document.createElement('button');
-  if(!own){b.className='pri';b.textContent=t('buy');b.onclick=()=>buy(id)}
+  const own=(w.owned||[]).includes(id),cn=((w.cnt||{})[id])||(own?1:0),lim=it.lim||1,inf=document.createElement('div'),b=document.createElement('button');
+  inf.innerHTML='<b></b><div class="hint"></div>';inf.children[0].textContent=it.name;inf.children[1].textContent=t('ty_'+it.type)+' · '+it.price+' 💰'+(lim>1?' · '+cn+'/'+lim:'');c.append(inf);
+  const canBuy=it.type==='sticker'?cn<lim:!own;
+  if(canBuy){b.className='pri';b.textContent=t('buy')+(cn&&lim>1?' ('+cn+'/'+lim+')':'');b.onclick=()=>buy(id)}
   else if(it.type==='sticker'){b.textContent=t('owned');b.disabled=true}
   else{const on=(w.eq||{})[it.type]===id;b.textContent=on?t('unequip'):t('equip');b.onclick=()=>equip(it.type,on?'':id)}
   c.append(b);g.append(c)})}
@@ -427,7 +432,7 @@ function wallEl(stk,id,edit){const wl=document.createElement('div');wl.className
   wl.append(e)});return wl}
 function renderWall(){const c=$('wedit');if(!c||!acc)return;c.innerHTML='';const w=wal[acc]||{owned:[],stk:[]};LS=structuredClone(w.stk||[]);c.append(wallEl(LS,acc,true));
  const bar=document.createElement('p');bar.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:8px';
- (w.owned||[]).filter(id=>shopItems[id]&&shopItems[id].type==='sticker').forEach(id=>{const b=document.createElement('button'),p=pv(shopItems[id]);p.style.cssText='height:32px;font-size:22px';const im=p.querySelector('img');if(im)im.style.maxHeight='32px';b.append(p);b.onclick=()=>{if(LS.length>=12)return;LS.push({i:id,x:50,y:50,s:30});selS=LS.length-1;saveStk()};bar.append(b)});
+ (w.owned||[]).filter(id=>shopItems[id]&&shopItems[id].type==='sticker').forEach(id=>{const b=document.createElement('button'),p=pv(shopItems[id]);p.style.cssText='height:32px;font-size:22px';const im=p.querySelector('img');if(im)im.style.maxHeight='32px';b.append(p);b.onclick=()=>{if(LS.length>=12||LS.filter(z=>z.i===id).length>=(((w.cnt||{})[id])||1))return;LS.push({i:id,x:50,y:50,s:30});selS=LS.length-1;saveStk()};bar.append(b)});
  [['−',-4],['+',4]].forEach(([l,d])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{const st=LS[selS];if(st){st.s=Math.max(8,Math.min(80,st.s+d));saveStk()}};bar.append(b)});
  const x=document.createElement('button');x.textContent='✕';x.onclick=()=>{if(LS[selS]){LS.splice(selS,1);selS=-1;saveStk()}};bar.append(x);c.append(bar)}
 function extra(id){const x=document.createElement('div'),W=wal[id]||{coins:0,owned:[]},u=users[id]||{},l1=document.createElement('p');l1.textContent='💰 '+(W.coins||0)+' femboy coins';x.append(l1);
@@ -450,31 +455,32 @@ let fd={};
 function renderSdata(){const k=$('sty').value,x=$('sdata');x.innerHTML='';fd={img:''};
  const inp=(ph,id,v)=>{const p=document.createElement('p'),i=document.createElement('input');i.type='text';i.id=id;i.placeholder=ph;i.value=v||'';p.append(i);x.append(p)};
  const upl=()=>{const p=document.createElement('p'),b=document.createElement('button'),pr=document.createElement('img'),f=document.createElement('input');pr.style.cssText='max-height:64px;vertical-align:middle;margin-left:8px';b.textContent=t('upimg');f.type='file';f.accept='image/*';f.hidden=true;
-  b.onclick=()=>f.click();f.onchange=async()=>{if(f.files[0]){const o=await cropTool(f.files[0]);f.value='';if(o){fd.img=o;pr.src=o}}};p.append(b,f,pr);x.append(p)};
- if(k==='sticker'){inp('Emoji','sem');upl()}
- else if(k==='frame'){const p=document.createElement('p'),s2=document.createElement('select');s2.id='sfr';Object.keys(FR).forEach(n=>s2.add(new Option(n,n)));p.append(s2);x.append(p);upl()}
+  b.onclick=()=>f.click();f.onchange=async()=>{if(f.files[0]){const o=await cropTool(f.files[0]);f.value='';if(o){fd.img=o;pr.src=o;renderPrev()}}};p.append(b,f,pr);x.append(p)};
+ if(k==='sticker'){inp('Emoji','sem');inp(t('limph'),'slim','1');upl()}
+ else if(k==='frame'){const p=document.createElement('p'),s2=document.createElement('select');s2.id='sfr';Object.keys(FR).forEach(n=>s2.add(new Option(n,n)));p.append(s2);x.append(p);const q=document.createElement('p'),lb=document.createElement('label'),sk=document.createElement('input');sk.type='range';sk.id='sk';sk.min=100;sk.max=180;sk.value=124;lb.append(t('frscale')+' ',sk);q.append(lb);x.append(q);upl()}
  else if(k==='icons')inp(t('iconhint'),'sic','📎 🎤 ➤ ＋ 📢 🔍 ⇅ ⚙');
- else{inp('#ff66aa','sbc','#ff66aa');inp('radius px','sbr','20')}}
-function buildOwn(){const b=$('own');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="pc"></p><p><input type="text" id="pn"></p><p><input type="text" id="pm"></p><p><button id="pg"></button> <button class="pri" id="pk"></button> <span id="pr"></span></p><div id="plist"></div></div><div class="card"><h3></h3><p><select id="sty"><option value="sticker"></option><option value="frame"></option><option value="icons"></option><option value="buttons"></option></select></p><p><input type="text" id="snm"></p><p><input type="text" id="spr"></p><div id="sdata"></div><p><button class="pri" id="sadd"></button> <span id="sres2"></span></p><div id="solist"></div></div>';
+ else{inp('#ff66aa','sbc','#ff66aa');inp('radius px','sbr','20')}
+ x.querySelectorAll('input[type=text],input[type=range],select').forEach(i=>{i.oninput=i.onchange=renderPrev});renderPrev()}
+function buildOwn(){const b=$('own');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="pc"></p><p><input type="text" id="pn"></p><p><input type="text" id="pm"></p><p><button id="pg"></button> <button class="pri" id="pk"></button> <span id="pr"></span></p><div id="plist"></div></div><div class="card"><h3></h3><p><select id="sty"><option value="sticker"></option><option value="frame"></option><option value="icons"></option><option value="buttons"></option></select></p><p><input type="text" id="snm"></p><p><input type="text" id="spr"></p><div id="sdata"></div><h4 id="spvt"></h4><div id="spv"></div><p><button class="pri" id="sadd"></button> <span id="sres2"></span></p><div id="solist"></div></div>';
  const hs=b.querySelectorAll('h3');hs[0].textContent=t('promos');hs[1].textContent=t('ownshop');
  $('pc').placeholder=t('pcode');$('pn').placeholder=t('pcoins');$('pm').placeholder=t('pmax');$('pg').textContent=t('gen');$('pk').textContent=t('create');
- ['sticker','frame','icons','buttons'].forEach((k,i)=>b.querySelectorAll('#sty option')[i].textContent=t('ty_'+k));$('snm').placeholder=t('chname');$('spr').placeholder=t('priceph');$('sadd').textContent=t('add');
+ ['sticker','frame','icons','buttons'].forEach((k,i)=>b.querySelectorAll('#sty option')[i].textContent=t('ty_'+k));$('snm').placeholder=t('chname');$('spr').placeholder=t('priceph');$('sadd').textContent=t('add');$('spvt').textContent=t('prev');
  $('pg').onclick=()=>$('pc').value=gen(10);
  $('pk').onclick=async()=>{const c=$('pc').value.trim(),n=+$('pn').value,m=+$('pm').value;if(!/^[A-Za-z0-9_-]{3,40}$/.test(c)||!(n>0)||!(m>0))return $('pr').textContent=t('need');
   try{await setDoc(doc(db,'promos',c),{coins:n,max:m,used:0,by:[],ts:Date.now()});$('pr').textContent=t('added');$('pc').value=$('pn').value=$('pm').value=''}catch(e){$('pr').textContent=e.code}};
  $('sty').onchange=renderSdata;renderSdata();
  $('sadd').onclick=async()=>{const k=$('sty').value,name=$('snm').value.trim(),price=+$('spr').value,m=$('sres2');if(!name||!(price>=0)||$('spr').value==='')return m.textContent=t('need');let data;
   if(k==='sticker'){data={emoji:$('sem').value.trim(),img:fd.img||''};if(!data.emoji&&!data.img)return m.textContent=t('need')}
-  else if(k==='frame')data={preset:$('sfr').value,img:fd.img||''};
+  else if(k==='frame')data={preset:$('sfr').value,img:fd.img||'',k:+$('sk').value||124};
   else if(k==='icons'){const a=$('sic').value.trim().split(/\s+/);data={pack:Object.fromEntries(Object.keys(DI).map((n,i)=>[n,a[i]||DI[n]]))}}
   else{const c=$('sbc').value.trim();if(!/^#[0-9a-f]{6}$/i.test(c))return m.textContent='#RRGGBB';data={c,r:+$('sbr').value||10}}
-  try{await addDoc(collection(db,'shop'),{type:k,name,price,data,ts:Date.now(),on:true});$('snm').value=$('spr').value='';renderSdata();m.textContent=t('added')}catch(e){m.textContent=e.code}};
+  try{const lim=k==='sticker'?Math.max(1,Math.min(99,Math.floor(+($('slim')||{}).value)||1)):1;await addDoc(collection(db,'shop'),{type:k,name,price,lim,data,ts:Date.now(),on:true});$('snm').value=$('spr').value='';renderSdata();m.textContent=t('added')}catch(e){m.textContent=e.code}};
  renderOwn()}
 function renderOwn(){const pl=$('plist');if(!pl)return;pl.innerHTML='';
  promos.forEach(p=>{const r=document.createElement('div'),s2=document.createElement('span'),x=document.createElement('button');r.className='ur';s2.textContent=p.id+' — '+p.coins+'💰 · '+p.used+'/'+p.max;x.textContent='✕';x.onclick=()=>deleteDoc(doc(db,'promos',p.id)).catch(e=>alert(e.code));r.append(s2,x);pl.append(r)});
  const so=$('solist');so.innerHTML='';
- Object.entries(shopItems).forEach(([id,it])=>{const r=document.createElement('div'),s2=document.createElement('span'),e=document.createElement('button'),x=document.createElement('button');r.className='ur';s2.textContent=t('ty_'+it.type)+': '+it.name+' — '+it.price+'💰';e.textContent='✎';
-  e.onclick=()=>{const v=prompt(t('priceph'),it.price);if(v!==null&&v!==''&&+v>=0)updateDoc(doc(db,'shop',id),{price:+v}).catch(er=>alert(er.code))};
+ Object.entries(shopItems).forEach(([id,it])=>{const r=document.createElement('div'),s2=document.createElement('span'),e=document.createElement('button'),x=document.createElement('button');r.className='ur';s2.textContent=t('ty_'+it.type)+': '+it.name+' — '+it.price+'💰'+(it.lim>1?' · ×'+it.lim:'');e.textContent='✎';
+  e.onclick=()=>{const v=prompt(t('priceph'),it.price);if(v!==null&&v!==''&&+v>=0){const o={price:+v};if(it.type==='sticker'){const l=prompt(t('limph'),it.lim||1);if(l!==null&&+l>=1)o.lim=Math.floor(+l)}updateDoc(doc(db,'shop',id),o).catch(er=>alert(er.code))}};
   x.textContent='✕';x.onclick=()=>{if(confirm(t('del')+'?'))deleteDoc(doc(db,'shop',id)).catch(er=>alert(er.code))};r.append(s2,e,x);so.append(r)})}
 async function addAdmin(){const n=prompt(t('admname'));if(!n)return;const c=gen(44),id=await ids(c),pf=await prf(c,'','');
  const b=writeBatch(db);b.set(doc(db,'staff',id),{name:n.trim(),role:'admin',ts:Date.now()});b.set(doc(db,'staffsec',id),{proof:pf});await b.commit();
@@ -545,6 +551,23 @@ async function purgeGone(){if(!accsOk)return;const st=id=>id===OWNER||id===CHIEF
  if(!confirm(t('purge')+': '+ids.length+'\n'+ids.slice(0,8).map(id=>(users[id]||{}).name||'?').join(', ')+'?'))return;
  for(let i=0;i<ids.length;i+=80){const b=writeBatch(db);ids.slice(i,i+80).forEach(id=>['users','wallet','galleries','prefs'].forEach(c=>b.delete(doc(db,c,id))));await b.commit()}
  alert(t('purged')+' '+ids.length)}
+function frameWrap(e,f){const w=document.createElement('span'),d=f.data||{};w.className='fw';
+ if(d.img){const k=d.k||124,o=Object.assign(document.createElement('img'),{src:d.img,className:'fo'});o.style.cssText='width:'+k+'%;height:'+k+'%;inset:'+(-(k-100)/2)+'%';w.style.padding='0';w.append(e,o)}
+ else{w.style.background=FR[d.preset]||FR.gold;w.append(e)}
+ return w}
+function draftData(){const k=$('sty').value,g=id=>$(id)?$(id).value:'';
+ if(k==='sticker')return{emoji:g('sem').trim(),img:fd.img||''};
+ if(k==='frame')return{preset:g('sfr')||'gold',img:fd.img||'',k:+g('sk')||124};
+ if(k==='icons'){const a=g('sic').trim().split(/\s+/);return{pack:Object.fromEntries(Object.keys(DI).map((n,i)=>[n,a[i]||DI[n]]))}}
+ return{c:/^#[0-9a-f]{6}$/i.test(g('sbc').trim())?g('sbc').trim():'#888888',r:+g('sbr')||10}}
+function renderPrev(){const b=$('spv');if(!b)return;b.innerHTML='';const k=$('sty').value,d=draftData(),col=(el,cap)=>{const c=document.createElement('div');c.className='col';const z=document.createElement('div');z.className='cap';z.textContent=cap;c.append(el,z);b.append(c)};
+ if(k==='frame'){[['pvprof',true,false],['pvchat',false,false],['pvlist',false,true]].forEach(([cap,big,sm])=>{const w=frameWrap(avatar({name:P.name||'A',avatar:P.avatar},big),{data:d});if(sm)w.classList.add('sm');col(w,t(cap))})}
+ else if(k==='sticker'){const wl=document.createElement('div');wl.className='wall';wl.style.width='160px';const th=P.theme;if(th&&th.bg)wl.style.background=rgb(th.bg);
+  const e=document.createElement('div');e.className='stk';e.style.left='50%';e.style.top='50%';
+  if(d.img){e.style.width='40%';e.append(Object.assign(document.createElement('img'),{src:d.img}))}else{e.textContent=d.emoji||'⭐';e.style.fontSize='32cqw'}
+  wl.append(e);col(wl,t('wall'))}
+ else if(k==='icons'){const r=document.createElement('div');r.style.cssText='display:flex;gap:4px;flex-wrap:wrap;max-width:260px';Object.keys(DI).forEach(n=>{const x=document.createElement('button');x.textContent=d.pack[n];r.append(x)});col(r,t('ty_icons'))}
+ else{const r=document.createElement('div');r.style.cssText='display:flex;gap:8px';const a=document.createElement('button');a.className='pri';a.textContent='OK';a.style.background=d.c;a.style.borderRadius=d.r+'px';const c2=document.createElement('button');c2.textContent='…';c2.style.borderRadius=d.r+'px';r.append(a,c2);col(r,t('ty_buttons'))}}
 async function start(a,nm){
  try{if((await getDoc(doc(db,'blocked',a))).exists()){await logout();$('err').textContent=t('blockedm');return}}catch(e){}
  first=new Promise(r=>firstRes=r);let dyn=false;try{dyn=(await getDoc(doc(db,'staff',a))).exists()}catch(e){}
