@@ -148,6 +148,7 @@ input[type=date]{font:inherit;color:inherit;background:var(--pan);border:1px sol
   <div class="card"><h3 data-i="iface"></h3><p data-i="listpos"></p><select id="lay"><option value="l"></option><option value="r"></option><option value="t"></option></select></div>
   <div class="card"><h3 data-i="wall"></h3><div id="wedit"></div></div>
   <div class="card"><h3 data-i="supp"></h3><button id="supbtn" data-i="opensup"></button></div>
+  <div class="card" id="ttlcard" hidden><h3 data-i="ttl_h"></h3><p><input type="text" id="ttli" maxlength="40"></p><button class="pri" id="ttls" data-i="save"></button> <button id="ttlr" data-i="ttl_reset"></button><p class="hint" data-i="ttl_note"></p></div>
   <div class="card"><h3 data-i="nt_title"></h3><p><label><input type="checkbox" id="ntc"> <span data-i="nt_on"></span></label></p><p><button id="ntp" data-i="nt_perm"></button> <span id="ntm"></span></p><p class="hint" data-i="nt_note"></p></div>
   <div class="card"><h3 data-i="inv"></h3><div id="invbox" class="grid"></div></div>
   <div class="card" id="credcard"><h3 data-i="secur"></h3><button id="credbtn" data-i="chcred"></button></div>
@@ -181,6 +182,9 @@ Object.assign(T.pl,{"ldmsg": "Witaj na tej stronce, poczekaj chwilkę, wszystko 
 Object.assign(T.ru,{"news": "Новости", "newsinfo": "Канал новостей: писать могут только владелец и главный админ", "online": "в сети", "offline": "не в сети", "min": "мин", "hr": "ч", "ach_site": "Достижения сайта", "ach_game": "Достижения мини-игр", "nt_title": "Уведомления", "nt_on": "Показывать уведомления о сообщениях", "nt_perm": "Разрешить системные уведомления", "nt_note": "Работают, пока сайт открыт (вкладка может быть в фоне)", "nt_freq": "{n} хочет добавить вас в друзья", "sa_s_msg1": "Первое сообщение", "sd_s_msg1": "Написать первое сообщение в чате", "sa_s_friend": "Первый друг", "sd_s_friend": "Добавить человека в друзья", "sa_s_shop": "Первая покупка", "sd_s_shop": "Воспользоваться магазином", "sa_s_react": "Реакция", "sd_s_react": "Поставить реакцию на сообщение", "sa_s_photo": "Фотограф", "sd_s_photo": "Отправить фото в чат", "sa_s_profile": "О себе", "sd_s_profile": "Заполнить описание и город или дату рождения", "sa_s_avatar": "Лицо сайта", "sd_s_avatar": "Поставить свою аватарку", "sa_s_game": "Печенька!", "sd_s_game": "Сыграть в мини-игру", "sa_s_friends5": "Душа компании", "sd_s_friends5": "Подружиться с 5 людьми"});
 Object.assign(T.en,{"news": "News", "newsinfo": "News channel: only the owner and the chief admin can post", "online": "online", "offline": "offline", "min": "min", "hr": "h", "ach_site": "Site achievements", "ach_game": "Mini-game achievements", "nt_title": "Notifications", "nt_on": "Show message notifications", "nt_perm": "Allow system notifications", "nt_note": "They work while the site is open (the tab may be in the background)", "nt_freq": "{n} wants to add you as a friend", "sa_s_msg1": "First message", "sd_s_msg1": "Send your first chat message", "sa_s_friend": "First friend", "sd_s_friend": "Add someone as a friend", "sa_s_shop": "First purchase", "sd_s_shop": "Use the shop", "sa_s_react": "Reaction", "sd_s_react": "React to a message", "sa_s_photo": "Photographer", "sd_s_photo": "Send a photo to a chat", "sa_s_profile": "About me", "sd_s_profile": "Fill in your bio and city or birthday", "sa_s_avatar": "Face of the site", "sd_s_avatar": "Set your own avatar", "sa_s_game": "Cookie!", "sd_s_game": "Play a mini-game", "sa_s_friends5": "Life of the party", "sd_s_friends5": "Make 5 friends"});
 Object.assign(T.pl,{"news": "Wiadomości", "newsinfo": "Kanał wiadomości: pisać mogą tylko właściciel i główny admin", "online": "online", "offline": "offline", "min": "min", "hr": "godz", "ach_site": "Osiągnięcia strony", "ach_game": "Osiągnięcia minigier", "nt_title": "Powiadomienia", "nt_on": "Pokazuj powiadomienia o wiadomościach", "nt_perm": "Zezwól na powiadomienia systemowe", "nt_note": "Działają, gdy strona jest otwarta (karta może być w tle)", "nt_freq": "{n} chce dodać Cię do znajomych", "sa_s_msg1": "Pierwsza wiadomość", "sd_s_msg1": "Napisz pierwszą wiadomość na czacie", "sa_s_friend": "Pierwszy znajomy", "sd_s_friend": "Dodaj kogoś do znajomych", "sa_s_shop": "Pierwszy zakup", "sd_s_shop": "Skorzystaj ze sklepu", "sa_s_react": "Reakcja", "sd_s_react": "Zareaguj na wiadomość", "sa_s_photo": "Fotograf", "sd_s_photo": "Wyślij zdjęcie na czacie", "sa_s_profile": "O mnie", "sd_s_profile": "Uzupełnij opis oraz miasto lub datę urodzenia", "sa_s_avatar": "Twarz strony", "sd_s_avatar": "Ustaw własny awatar", "sa_s_game": "Ciasteczko!", "sd_s_game": "Zagraj w minigrę", "sa_s_friends5": "Dusza towarzystwa", "sd_s_friends5": "Zaprzyjaźnij się z 5 osobami"});
+Object.assign(T.ru,{"ttl_h": "Название приложения (только для вас)", "ttl_note": "Видно только вам на этом устройстве. Доступно владельцу и главному админу.", "ttl_reset": "Вернуть исходное", "nick_set": "Ник", "nick_ask": "Ник для этого друга (виден только вам; пусто — убрать)", "nick_real": "Настоящее имя", "ae_slot": "Слот", "ae_two": "Админам и владельцу доступны 2 стикера на аватарке", "gifbig": "GIF слишком большой (до ≈700 КБ)", "gifbig2": "GIF слишком большой для магазина (до 600 КБ)"});
+Object.assign(T.en,{"ttl_h": "App title (only for you)", "ttl_note": "Visible only to you on this device. Available to the owner and the chief admin.", "ttl_reset": "Restore default", "nick_set": "Nickname", "nick_ask": "Nickname for this friend (only you see it; empty = remove)", "nick_real": "Real name", "ae_slot": "Slot", "ae_two": "Admins and the owner can wear 2 avatar stickers", "gifbig": "GIF is too large (up to ≈700 KB)", "gifbig2": "GIF is too large for the shop (up to 600 KB)"});
+Object.assign(T.pl,{"ttl_h": "Nazwa aplikacji (tylko dla Ciebie)", "ttl_note": "Widoczne tylko dla Ciebie na tym urządzeniu. Dostępne dla właściciela i głównego admina.", "ttl_reset": "Przywróć domyślną", "nick_set": "Pseudonim", "nick_ask": "Pseudonim dla tego znajomego (widzisz tylko Ty; puste = usuń)", "nick_real": "Prawdziwe imię", "ae_slot": "Slot", "ae_two": "Admini i właściciel mogą nosić 2 naklejki na awatarze", "gifbig": "GIF jest za duży (do ≈700 KB)", "gifbig2": "GIF jest za duży dla sklepu (do 600 KB)"});
 const DEF={bg:[244,245,247],tx:[27,31,36],ac:[43,125,233]};
 let L=localStorage.lang||((navigator.language||'en').slice(0,2)),auth,db,me=null,P={},users={},unsub;
 if(!T[L])L='en';
@@ -198,7 +202,7 @@ function loadGT(){if(window.google&&google.translate)return;window.gtInit=()=>ne
  const s=document.createElement('script');s.src='https://translate.google.com/translate_a/element.js?cb=gtInit';document.head.append(s)}
 function avatar(u,big){const e=u&&u.avatar?Object.assign(document.createElement('img'),{src:u.avatar}):document.createElement('span');
  e.className='av'+(big?' big':'');if(!(u&&u.avatar))e.textContent=((u&&u.name)||'?')[0].toUpperCase();
- const f=u&&u._id&&frameOf(u._id);let out=f?frameWrap(e,f):e;const sv=u&&u._id&&avsOf(u._id),wg=u&&u._id&&wingsOf(u._id);if(sv||wg){const w=document.createElement('span');w.className='bw'+(big?' big':'');if(wg)w.append(wingEl(wg));w.append(out);if(sv)w.append(stkEl(sv.item,sv.pos));out=w}return out}
+ const f=u&&u._id&&frameOf(u._id);let out=f?frameWrap(e,f):e;const sv=u&&u._id&&avsOf(u._id),sv2=u&&u._id&&avs2Of(u._id),wg=u&&u._id&&wingsOf(u._id);if(sv||sv2||wg){const w=document.createElement('span');w.className='bw'+(big?' big':'');if(wg)w.append(wingEl(wg));w.append(out);if(sv)w.append(stkEl(sv.item,sv.pos));if(sv2)w.append(stkEl(sv2.item,sv2.pos));out=w}return out}
 // --- RGB panel ---
 function buildRGB(){const box=$('rgb');box.innerHTML='';const hx=a=>'#'+a.map(v=>v.toString(16).padStart(2,'0')).join('');
  ['bg','tx','ac'].forEach(k=>{const w=document.createElement('div');w.innerHTML=`<b>${t(k)}</b><div class="sw"></div><input type="text" class="hx" maxlength="7" placeholder="#RRGGBB">`;
@@ -263,7 +267,7 @@ let fu,acc=null,role='user',subs=[],muteUntil=0,accs=[],bl=new Set(),mu={};
 const newCode=()=>{$('code').value=localStorage.nc||(localStorage.nc=gen(32))};
 $('regen').onclick=()=>{localStorage.removeItem('nc');newCode()};
 $('cp').onclick=async()=>{try{await navigator.clipboard.writeText($('code').value)}catch(e){$('code').select();document.execCommand('copy')}$('cp').textContent=t('copied');setTimeout(()=>$('cp').textContent=t('copy'),1500)};
-function showLogin(){splash(false);$('login').hidden=false;['tChat','tProf','tAdm','tShop','tGame','tAch','tOwn','out','chat','prof','adm','shop','own','game','ach'].forEach(i=>$(i).hidden=true);applyTheme();newCode()}
+function showLogin(){role='user';applyTitle();splash(false);$('login').hidden=false;['tChat','tProf','tAdm','tShop','tGame','tAch','tOwn','out','chat','prof','adm','shop','own','game','ach'].forEach(i=>$(i).hidden=true);applyTheme();newCode()}
 async function logout(){subs.forEach(f=>f());subs=[];if(msgSub){msgSub();msgSub=null}fr=[];rq=[];wal={};shopItems={};staffD={};threads=[];siteDone={};siteLoaded=false;pres={};rqReady=false;try{if(gsub)gsub();gid=null;gm=null;cst=null;achs=[];lb=null;gmenu=false;gview='home';clearInterval(gTimer)}catch(e){}pf={hid:{},arc:[]};showArch=false;accsOk=false;if(rxSub){rxSub();rxSub=null}Object.values(usubs).forEach(f=>f());usubs={};un={};cur={id:'global',type:'global'};myRooms=[];G=[];try{await deleteDoc(doc(db,'sessions',fu.uid))}catch(e){}me=null;acc=null;msgs=[];showLogin()}
 const mute=id=>{const m=+prompt(t('mins'),'10');return m>0?setDoc(doc(db,'mutes',id),{until:Date.now()+m*60000}):Promise.resolve()};
 function buildAdm(){const b=$('adm');b.innerHTML='<div class="card"><h3></h3><p><input type="text" id="ac" style="font-family:monospace"></p><p><input type="text" id="an"></p><p><input type="text" id="ap"></p><button class="pri" id="aadd"></button> <span id="ares"></span></div><div class="card"><h3 id="supt"></h3><div id="slist"></div></div><div class="card"><div id="aaw"></div><div id="alist"></div></div>';
@@ -290,7 +294,7 @@ function sorted(){const seen=new Set(),rest=myRooms.filter(r=>!seen.has(r.id)&&s
 function move(id,d){if(id==='news'||id==='global')return;const l=sorted().filter(r=>r.id!=='news'&&r.id!=='global').map(r=>r.id),i=l.indexOf(id),j=i+d;if(i<0||j<0||j>=l.length)return;[l[i],l[j]]=[l[j],l[i]];localStorage[ordKey()]=JSON.stringify(l);renderRooms()}
 const isHid=id=>!!(pf.hid&&pf.hid[id]),isArc=id=>(pf.arc||[]).includes(id);
 const addRoomLocal=r=>{if(!myRooms.find(x=>x.id===r.id))myRooms.push(r)};
-const savePf=()=>setDoc(doc(db,'prefs',acc),{hid:pf.hid||{},arc:pf.arc||[]}).catch(e=>alert(e.code));
+const savePf=()=>setDoc(doc(db,'prefs',acc),{hid:pf.hid||{},arc:pf.arc||[],nicks:pf.nicks||{}}).catch(e=>alert(e.code));
 function hideRoom(id){pf.hid={...(pf.hid||{}),[id]:Date.now()};pf.arc=(pf.arc||[]).filter(x=>x!==id);if(cur.id===id)subRoom({id:'global',type:'global'});renderRooms();return savePf()}
 function arch(id){pf.arc=[...new Set([...(pf.arc||[]),id])];renderRooms();return savePf()}
 function unarch(id){pf.arc=(pf.arc||[]).filter(x=>x!==id);renderRooms();return savePf()}
@@ -350,7 +354,7 @@ $('rch').onclick=()=>{const d=$('dlg');d.innerHTML='<h3></h3><div id="cl"></div>
   b.onclick=async()=>{try{await updateDoc(doc(db,'rooms',c.id),{members:arrayUnion(acc)});d.close();subRoom({...c,members:[...c.members,acc]})}catch(e){alert(e.code)}};r.append(sp,b);$('cl').append(r)});d.showModal()};
 async function openProf(id){const d=$('pd'),u=users[id]||{};d.innerHTML='';
  const head=document.createElement('div');head.style.cssText='display:flex;gap:12px;align-items:center';const nm=document.createElement('div');nm.innerHTML='<b></b><div></div>';
- nm.children[0].textContent=badge(id)+(u.name||'?');nm.children[1].textContent=u.bio||'';nm.append(statusEl(id));head.append(avatar(u,true),nm);
+ nm.children[0].textContent=badge(id)+(u.name||'?');nm.children[1].style.whiteSpace='pre-wrap';nm.children[1].textContent=(u.rn&&u.rn!==u.name?t('nick_real')+': '+u.rn+'\n':'')+(u.bio||'');nm.append(statusEl(id));head.append(avatar(u,true),nm);
  const h=document.createElement('h4');h.textContent=t('gallery');
  const big=document.createElement('img');big.style.cssText='width:100%;border-radius:10px;margin-top:10px;display:none';
  const gal=document.createElement('div');gal.className='gal';
@@ -442,7 +446,7 @@ function renderShop(){const g=$('sgrid');if(!g)return;const w=wal[acc]||{coins:0
   const canBuy=it.type==='sticker'?cn<lim:!own;
   if(canBuy){b.className='pri';b.textContent=t('buy')+(cn&&lim>1?' ('+cn+'/'+lim+')':'');b.onclick=()=>buy(id)}
   else if(it.type==='sticker'||it.type==='react'){b.textContent=t('owned');b.disabled=true}
-  else{const on=it.type==='avstk'?((w.eq||{}).avs||{}).i===id:(w.eq||{})[it.type]===id;b.textContent=on?t('unequip'):t('equip');b.onclick=()=>it.type==='avstk'?(on?clearAvs():openAvEdit(id)):equip(it.type,on?'':id)}
+  else{const on=it.type==='avstk'?(((w.eq||{}).avs||{}).i===id||(isStaffId(acc)&&((w.eq||{}).avs2||{}).i===id)):(w.eq||{})[it.type]===id;b.textContent=on?t('unequip'):t('equip');b.onclick=()=>it.type==='avstk'?(on?clearAvs(id):openAvEdit(id)):equip(it.type,on?'':id)}
   c.append(b);g.append(c)})}
 let LS=[],selS=-1;
 const saveStk=()=>updateDoc(doc(db,'wallet',acc),{stk:LS}).catch(e=>alert(e.code));
@@ -499,7 +503,7 @@ function renderSdata(){const k=$('sty').value,x=$('sdata');x.innerHTML='';fd={im
  const inp=(ph,id,v)=>{const p=document.createElement('p'),i=document.createElement('input');i.type='text';i.id=id;i.placeholder=ph;i.value=v||'';p.append(i);x.append(p)};
  const sld=(id,lab,min,max,val)=>{const q=document.createElement('p'),lb=document.createElement('label'),i=document.createElement('input');i.type='range';i.id=id;i.min=min;i.max=max;i.value=val;lb.append(lab+' ',i);q.append(lb);x.append(q)};
  const upl=()=>{const p=document.createElement('p'),b=document.createElement('button'),pr=document.createElement('img'),f=document.createElement('input');pr.style.cssText='max-height:64px;vertical-align:middle;margin-left:8px';b.textContent=t('upimg');f.type='file';f.accept='image/*';f.hidden=true;
-  b.onclick=()=>f.click();f.onchange=async()=>{const file=f.files[0];if(!file)return;let o=null;if(file.type==='image/gif'){if(file.size>400000){alert(t('gifbig2'));f.value='';return}o=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(file)})}else o=await cropTool(file);f.value='';if(o){fd.img=o;pr.src=o;renderPrev()}};p.append(b,f,pr);x.append(p)};
+  b.onclick=()=>f.click();f.onchange=async()=>{const file=f.files[0];if(!file)return;let o=null;if(file.type==='image/gif'){if(file.size>600000){alert(t('gifbig2'));f.value='';return}o=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(file)})}else o=await cropTool(file);f.value='';if(o){fd.img=o;pr.src=o;renderPrev()}};p.append(b,f,pr);x.append(p)};
  if(k==='wings'){sld('sk',t('frscale'),100,400,220);sld('sdy',t('fdy'),-50,50,0);upl()}
  else if(k==='avstk'){inp('Emoji','sem');upl()}
  else if(k==='sticker'){inp('Emoji','sem');inp(t('limph'),'slim','1');upl()}
@@ -593,7 +597,7 @@ function drawer(on){$('chat').classList.toggle('open',on)}
 function openF(on){$('prof').classList.toggle('open',on)}
 function friendBtns(id,d){const out=[],mk=(l,f,c)=>{const b=document.createElement('button');b.textContent=l;if(c)b.className=c;b.onclick=()=>{f().then(()=>d.close()).catch(e=>alert(e.code))};out.push(b,' ')};
  const p=pid(acc,id),inc=rq.find(r=>r.id===p&&r.from!==acc),og=rq.find(r=>r.id===p&&r.from===acc);
- if(isFr(id)){mk(t('write'),()=>openDM(id),'pri');mk(t('unfriend'),()=>confirm(t('unfriend')+'?')?delDoc('friends',p):Promise.resolve())}
+ if(isFr(id)){mk(t('write'),()=>openDM(id),'pri');mk('✎ '+t('nick_set'),()=>setNick(id));mk(t('unfriend'),()=>confirm(t('unfriend')+'?')?delDoc('friends',p):Promise.resolve())}
  else if(inc){mk('✓ '+t('accept'),()=>accept(inc),'pri');mk(t('decline'),()=>delDoc('freq',p))}
  else if(og)mk(t('cancelreq'),()=>delDoc('freq',p));
  else mk('＋ '+t('addfr'),()=>sendReq(id),'pri');
@@ -609,7 +613,7 @@ function renderFriends(){const inc=rq.filter(r=>r.from!==acc),out=rq.filter(r=>r
  const sec=(title,arr,mk)=>{if(!arr.length)return;const h=document.createElement('h4');h.textContent=title;b.append(h);arr.forEach(x=>b.append(mk(x)))};
  sec(t('incoming'),inc,r=>prow(r.members.find(x=>x!==acc),[['✓',()=>accept(r),'pri'],['✕',()=>delDoc('freq',r.id)]]));
  sec(t('outgoing'),out,r=>prow(r.members.find(x=>x!==acc),[[t('cancel'),()=>delDoc('freq',r.id)]]));
- sec(t('friends'),mine,f=>{const o=f.members.find(x=>x!==acc);return prow(o,[['💬',()=>{openF(false);return openDM(o)}],['✕',()=>confirm(t('unfriend')+'?')?delDoc('friends',f.id):Promise.resolve()]])});
+ sec(t('friends'),mine,f=>{const o=f.members.find(x=>x!==acc);return prow(o,[['💬',()=>{openF(false);return openDM(o)}],['✎',()=>setNick(o)],['✕',()=>confirm(t('unfriend')+'?')?delDoc('friends',f.id):Promise.resolve()]])});
  if(!mine.length&&!rq.length){const p=document.createElement('p');p.className='hint';p.textContent=t('nofr');b.append(p)}}
 $('rshade').onclick=$('rx').onclick=()=>drawer(false);
 $('fshade').onclick=$('fx').onclick=()=>openF(false);$('fopen').onclick=()=>openF(true);$('fsr').onclick=()=>$('rsr').click();
@@ -671,27 +675,32 @@ function applyStk(el,it,pos){el.style.left=pos.x+'%';el.style.top=pos.y+'%';el.s
 function stkEl(it,pos){const el=document.createElement('div');el.className='as';if(it.data.img)el.append(Object.assign(document.createElement('img'),{src:it.data.img}));else el.textContent=it.data.emoji||'⭐';applyStk(el,it,pos);return el}
 function stkOnAvatar(base,it,pos,big){const w=document.createElement('span');w.className='bw'+(big?' big':'');w.append(base,stkEl(it,pos));return w}
 function avsOf(id){const w=wal[id];if(!w||!w.eq||!w.eq.avs)return null;const p=w.eq.avs,it=shopItems[p.i];return it&&it.type==='avstk'&&(w.owned||[]).includes(p.i)?{item:it,pos:p}:null}
-const clearAvs=()=>updateDoc(doc(db,'wallet',acc),{eq:{...((wal[acc]||{}).eq||{}),avs:null}}).catch(e=>alert(e.code));
-function openAvEdit(id){const it=shopItems[id],d=$('ae'),c0=((wal[acc]||{}).eq||{}).avs,pos=c0&&c0.i===id?{...c0}:{i:id,x:72,y:72,s:45,r:0};d.innerHTML='';
+const clearAvs=id=>{const eq={...((wal[acc]||{}).eq||{})};['avs','avs2'].forEach(k=>{if(eq[k]&&(!id||eq[k].i===id))eq[k]=null});return updateDoc(doc(db,'wallet',acc),{eq}).catch(e=>alert(e.code))};
+function openAvEdit(id){const it=shopItems[id],d=$('ae'),eq=(wal[acc]||{}).eq||{},two=isStaffId(acc);
+ let slot=eq.avs&&eq.avs.i===id?'avs':(two&&eq.avs2&&eq.avs2.i===id?'avs2':(two&&eq.avs&&eq.avs.i!==id&&!eq.avs2?'avs2':'avs'));
+ const c0=eq[slot],pos=c0&&c0.i===id?{...c0}:{i:id,x:72,y:72,s:45,r:0};d.innerHTML='';
  const h=document.createElement('h3');h.textContent=t('ae_title');const box=document.createElement('div');box.style.cssText='display:flex;justify-content:center;margin:70px 0';
  const bw=document.createElement('span');bw.className='bw big';bw.style.transform='scale(1.6)';bw.append(avatar({name:P.name||'A',avatar:P.avatar},true));const st=stkEl(it,pos);st.style.pointerEvents='auto';st.style.touchAction='none';st.style.cursor='grab';bw.append(st);box.append(bw);
  st.onpointerdown=ev=>{st.setPointerCapture(ev.pointerId);const R=bw.getBoundingClientRect();st.onpointermove=m=>{pos.x=Math.max(-20,Math.min(120,(m.clientX-R.left)/R.width*100));pos.y=Math.max(-20,Math.min(120,(m.clientY-R.top)/R.height*100));applyStk(st,it,pos)};st.onpointerup=()=>{st.onpointermove=st.onpointerup=null}};
  const mk=(lab,min,max,key)=>{const p=document.createElement('p'),l=document.createElement('label'),i=Object.assign(document.createElement('input'),{type:'range',min,max,value:pos[key]});i.oninput=()=>{pos[key]=+i.value;applyStk(st,it,pos)};l.append(lab+' ',i);p.append(l);return p};
  const bar=document.createElement('p');bar.style.cssText='display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap';
- const ok=document.createElement('button');ok.className='pri';ok.textContent=t('save');ok.onclick=()=>updateDoc(doc(db,'wallet',acc),{eq:{...((wal[acc]||{}).eq||{}),avs:{i:id,x:+pos.x.toFixed(1),y:+pos.y.toFixed(1),s:pos.s,r:pos.r||0}}}).then(()=>d.close()).catch(e=>alert(e.code));
- const rm=document.createElement('button');rm.textContent=t('ae_rm');rm.onclick=()=>{clearAvs();d.close()};const no=document.createElement('button');no.textContent=t('cancel');no.onclick=()=>d.close();bar.append(no,rm,ok);
- d.append(h,box,mk(t('ae_size'),10,100,'s'),mk(t('w_rot'),0,360,'r'),bar);d.showModal()}
+ const ok=document.createElement('button');ok.className='pri';ok.textContent=t('save');
+ ok.onclick=()=>{const e2={...((wal[acc]||{}).eq||{}),[slot]:{i:id,x:+pos.x.toFixed(1),y:+pos.y.toFixed(1),s:pos.s,r:pos.r||0}},other=slot==='avs'?'avs2':'avs';if(e2[other]&&e2[other].i===id)e2[other]=null;updateDoc(doc(db,'wallet',acc),{eq:e2}).then(()=>d.close()).catch(e=>alert(e.code))};
+ const rm=document.createElement('button');rm.textContent=t('ae_rm');rm.onclick=()=>{clearAvs(id);d.close()};const no=document.createElement('button');no.textContent=t('cancel');no.onclick=()=>d.close();bar.append(no,rm,ok);
+ d.append(h);
+ if(two){const sp=document.createElement('p'),sl=document.createElement('select');sp.className='hint';sp.textContent=t('ae_two');[['avs','1'],['avs2','2']].forEach(([v,l])=>sl.add(new Option(t('ae_slot')+' '+l,v)));sl.value=slot;sl.onchange=()=>{slot=sl.value};d.append(sp,sl)}
+ d.append(box,mk(t('ae_size'),10,100,'s'),mk(t('w_rot'),0,360,'r'),bar);d.showModal()}
 function renderPav(){if(!acc||!$('pav'))return;const a=avatar(P,true);a.id='pav';$('pav').replaceWith(a)}
 function renderInv(){const b=$('invbox');if(!b||!acc)return;b.innerHTML='';const w=wal[acc]||{owned:[],eq:{}};
  [...new Set(w.owned||[])].map(id=>[id,shopItems[id]]).filter(([,it])=>it).forEach(([id,it])=>{const c=document.createElement('div');c.className='item';c.append(pv(it));const n=document.createElement('div');n.innerHTML='<b></b><div class="hint"></div>';n.children[0].textContent=it.name;n.children[1].textContent=t('ty_'+it.type);c.append(n);
   const bt=document.createElement('button');
   if(it.type==='sticker'){bt.textContent=t('onwall');bt.onclick=()=>{LS=structuredClone(w.stk||[]);if(LS.length>=12||LS.filter(z=>z.i===id).length>=(((w.cnt||{})[id])||1))return;LS.push({i:id,x:50,y:50,s:30,r:0});selS=LS.length-1;saveStk()}}
   else if(it.type==='react'){bt.textContent=t('owned');bt.disabled=true}
-  else if(it.type==='avstk'){const on=((w.eq||{}).avs||{}).i===id;bt.textContent=on?t('unequip'):t('equip');bt.onclick=()=>on?clearAvs():openAvEdit(id);if(on){const e2=document.createElement('button');e2.textContent=t('edit');e2.onclick=()=>openAvEdit(id);c.append(e2)}}
+  else if(it.type==='avstk'){const on=(((w.eq||{}).avs||{}).i===id||(isStaffId(acc)&&((w.eq||{}).avs2||{}).i===id));bt.textContent=on?t('unequip'):t('equip');bt.onclick=()=>on?clearAvs(id):openAvEdit(id);if(on){const e2=document.createElement('button');e2.textContent=t('edit');e2.onclick=()=>openAvEdit(id);c.append(e2)}}
   else{const on=(w.eq||{})[it.type]===id;bt.textContent=on?t('unequip'):t('equip');bt.onclick=()=>equip(it.type,on?'':id)}
   c.append(bt);b.append(c)})}
 const jpegUnder=(cv,lim)=>{for(const sc of[1,.8,.65,.5,.4]){const t2=document.createElement('canvas');t2.width=Math.round(cv.width*sc);t2.height=Math.round(cv.height*sc);t2.getContext('2d').drawImage(cv,0,0,t2.width,t2.height);for(let q=.85;q>.3;q-=.1){const o=t2.toDataURL('image/jpeg',q);if(o.length<lim)return o}}return cv.toDataURL('image/jpeg',.3)};
-async function photoEditor(file){const d=$('pe');d.innerHTML='';const isGif=file.type==='image/gif';if(isGif&&file.size>600000)return alert(t('gifbig'));
+async function photoEditor(file){const d=$('pe');d.innerHTML='';const isGif=file.type==='image/gif';if(isGif&&file.size>700000)return alert(t('gifbig'));
  const url=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});
  const h=document.createElement('h3');h.textContent=t('pe_title');const cap=document.createElement('input');cap.type='text';cap.placeholder=t('pe_cap');cap.maxLength=300;
  const bar=document.createElement('p');bar.style.cssText='display:flex;gap:6px;justify-content:flex-end';const ok=document.createElement('button');ok.className='pri';ok.textContent=t('pe_send');const no=document.createElement('button');no.textContent=t('cancel');no.onclick=()=>d.close();bar.append(no,ok);
@@ -713,7 +722,7 @@ async function photoEditor(file){const d=$('pe');d.innerHTML='';const isGif=file
  dc.onpointermove=e=>{if(!down)return;const[x,y]=pos(e);g.lineTo(x,y);g.stroke();g.beginPath();g.moveTo(x,y)};dc.onpointerup=dc.onpointercancel=()=>{down=false};
  ok.onclick=()=>{const ex=document.createElement('canvas');ex.width=bc.width;ex.height=bc.height;const x=ex.getContext('2d');x.drawImage(bc,0,0);x.drawImage(dc,0,0);const B=+br.value,C=+co.value,S=+sa.value;
   if(B!==1||C!==1||S!==1){const id=x.getImageData(0,0,ex.width,ex.height),px=id.data,cl2=v=>v<0?0:v>255?255:v;for(let i=0;i<px.length;i+=4){const l=.299*px[i]+.587*px[i+1]+.114*px[i+2];for(let j=0;j<3;j++){let v=l+(px[i+j]-l)*S;v=(v-128)*C+128;px[i+j]=cl2(v*B)}}x.putImageData(id,0,0)}
-  post({kind:'img',src:jpegUnder(ex,230000),text:cap.value.trim()});d.close()};
+  post({kind:'img',src:jpegUnder(ex,330000),text:cap.value.trim()});d.close()};
  d.append(h,stack,tb,bp,cp2,sp,cap,bar);d.showModal()}
 
 let gPending=false,gMsg='',gBetKeep=null,gid=null,gm=null,gsub=null,gview='home',gmenu=false,gst={},gClicked=false,gCookieAt=0,gTimer=null,gClaiming=false,cst=null,achs=[],lb=null,lbTab='paws',lbSort='ms';
@@ -854,22 +863,30 @@ function renderAchTab(){const c=$('ach');if(!c||!acc)return;c.innerHTML='';const
   const st=got?gBtn(t('g_got'),()=>{}):ok?gBtn(t('g_claim'),()=>claimAch(a),'pri'):gBtn(t('g_locked'),()=>{});st.disabled=got||!ok;r.append(b,d,rw,st);w.append(r)});
  c.append(w)}
 $('tAch').onclick=()=>{tab('ach');if(!lb)loadLb().then(renderAchTab);else renderAchTab()};
+const isStaffId=id=>id===OWNER||id===CHIEF||ADMINS.includes(id)||!!staffD[id];
+function avs2Of(id){if(!isStaffId(id))return null;const w=wal[id];if(!w||!w.eq||!w.eq.avs2)return null;const p=w.eq.avs2,it=shopItems[p.i];return it&&it.type==='avstk'&&(w.owned||[]).includes(p.i)?{item:it,pos:p}:null}
+function applyNicks(){const n=pf.nicks||{};Object.keys(users).forEach(id=>{const u=users[id];if(u.rn===undefined)u.rn=u.name;u.name=(n[id]&&id!==acc&&isFr(id))?n[id]:u.rn})}
+async function setNick(id){if(!isFr(id))return;const u=users[id]||{},v=prompt(t('nick_ask')+' ('+t('nick_real')+': '+(u.rn||u.name||'?')+')',(pf.nicks||{})[id]||'');if(v===null)return;const n={...(pf.nicks||{})},x=v.trim().slice(0,30);if(x)n[id]=x;else delete n[id];pf.nicks=n;applyNicks();draw();renderRooms();renderFriends();await savePf()}
+const DEFTTL='🏳️‍⚧️ Фембойский чатик 🏳️‍⚧️';
+function applyTitle(){const tt=(isTop()&&localStorage.apptitle)||DEFTTL;$('ttl').textContent=tt;document.title=tt.replace(/[\u{1F3F3}\u{FE0F}\u{200D}\u{26A7}]/gu,'').trim()||'Chat'}
+$('ttls').onclick=()=>{const v=$('ttli').value.trim().slice(0,40);if(v)localStorage.apptitle=v;else localStorage.removeItem('apptitle');applyTitle()};
+$('ttlr').onclick=()=>{localStorage.removeItem('apptitle');$('ttli').value='';applyTitle()};
 async function start(a,nm){
  try{if((await getDoc(doc(db,'blocked',a))).exists()){await logout();$('err').textContent=t('blockedm');return}}catch(e){}
  first=new Promise(r=>firstRes=r);let dyn=false;try{dyn=(await getDoc(doc(db,'staff',a))).exists()}catch(e){}
  acc=a;role=a===OWNER?'owner':a===CHIEF?'chief':(ADMINS.includes(a)||dyn)?'admin':'user';
  me={uid:a,displayName:nm||(role==='owner'?'Owner':role==='chief'?'Chief':role==='admin'?'Admin':'User')};
- $('login').hidden=true;['tChat','tProf','tShop','tGame','tAch','out'].forEach(i=>$(i).hidden=false);$('tAdm').hidden=role==='user';$('tOwn').hidden=role!=='owner';$('credcard').hidden=role!=='user';
+ $('login').hidden=true;['tChat','tProf','tShop','tGame','tAch','out'].forEach(i=>$(i).hidden=false);$('tAdm').hidden=role==='user';$('tOwn').hidden=role!=='owner';$('credcard').hidden=role!=='user';$('ttlcard').hidden=!isTop();applyTitle();$('ttli').value=localStorage.apptitle||'';
  P={_id:a,name:me.displayName,avatar:'',bio:'',theme:structuredClone(DEF)};
  const u=doc(db,'users',a),E=()=>{},bad=e=>{if(e.code==='permission-denied')logout().then(()=>$('err').textContent=t('denied'))};
  getDoc(u).then(s=>{if(!s.exists())setDoc(u,{name:me.displayName})}).catch(E);
  subs=[onSnapshot(u,s=>{if(s.exists()&&!P._l){P={...P,...s.data(),_l:1};if(P.lang&&T[P.lang]){L=P.lang;localStorage.lang=L;i18n()}}applyTheme(P.theme);renderProf()},E),
-  onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]={...d.data(),_id:d.id});draw();renderAdm();renderRooms();firstRes()},E),
+  onSnapshot(collection(db,'users'),s=>{users={};s.docs.forEach(d=>users[d.id]={...d.data(),_id:d.id});applyNicks();draw();renderAdm();renderRooms();firstRes()},E),
   onSnapshot(query(collection(db,'rooms'),where('members','array-contains',a)),s=>{myRooms=s.docs.map(d=>({id:d.id,...d.data()}));if(cur.id!=='global'&&!myRooms.find(r=>r.id===cur.id))subRoom({id:'global',type:'global'});else renderRooms();watch()},denied),onSnapshot(query(collection(db,'rooms'),where('type','==','channel')),s=>{chans=s.docs.map(d=>({id:d.id,...d.data()}))},E),
   onSnapshot(doc(db,'mutes',a),s=>{muteUntil=s.exists()?s.data().until:0;$('txt').placeholder=Date.now()<muteUntil?t('muted'):t('msg')},E)];
- subs.push(onSnapshot(doc(db,'prefs',a),s=>{pf=s.exists()?{hid:s.data().hid||{},arc:s.data().arc||[]}:{hid:{},arc:[]};renderRooms()},E));
+ subs.push(onSnapshot(doc(db,'prefs',a),s=>{pf=s.exists()?{hid:s.data().hid||{},arc:s.data().arc||[],nicks:s.data().nicks||{}}:{hid:{},arc:[],nicks:{}};applyNicks();draw();renderRooms();renderFriends()},E));
  subs.push(onSnapshot(doc(db,'walls',a),s=>{wdraw[a]=s.exists()?s.data().draw||'':''},E));
- subs.push(onSnapshot(collection(db,'wallet'),s=>{wal={};s.docs.forEach(d=>wal[d.id]=d.data());refresh()},E),onSnapshot(collection(db,'shop'),s=>{shopItems={};s.docs.forEach(d=>shopItems[d.id]=d.data());refresh()},E),onSnapshot(collection(db,'staff'),s=>{staffD={};s.docs.forEach(d=>staffD[d.id]=d.data());renderAdm();draw()},E),onSnapshot(collection(db,'friends'),s=>{fr=s.docs.map(d=>({id:d.id,...d.data()}));{const mn=fr.filter(f=>f.members.includes(acc)).length;if(mn>=1)unlockSite('s_friend');if(mn>=5)unlockSite('s_friends5')}renderFriends();renderRooms()},E),onSnapshot(query(collection(db,'freq'),where('members','array-contains',a)),s=>{{const old=new Set(rq.map(r=>r.id));rq=s.docs.map(d=>({id:d.id,...d.data()}));if(rqReady)rq.filter(r=>r.from!==acc&&!old.has(r.id)).forEach(r=>{const o=r.members.find(x=>x!==acc);pushNote(t('nt_freq').replace('{n}',(users[o]||{}).name||'?'),'',()=>tab('prof'))});rqReady=true}renderFriends()},E));
+ subs.push(onSnapshot(collection(db,'wallet'),s=>{wal={};s.docs.forEach(d=>wal[d.id]=d.data());refresh()},E),onSnapshot(collection(db,'shop'),s=>{shopItems={};s.docs.forEach(d=>shopItems[d.id]=d.data());refresh()},E),onSnapshot(collection(db,'staff'),s=>{staffD={};s.docs.forEach(d=>staffD[d.id]=d.data());renderAdm();draw()},E),onSnapshot(collection(db,'friends'),s=>{fr=s.docs.map(d=>({id:d.id,...d.data()}));applyNicks();{const mn=fr.filter(f=>f.members.includes(acc)).length;if(mn>=1)unlockSite('s_friend');if(mn>=5)unlockSite('s_friends5')}renderFriends();renderRooms()},E),onSnapshot(query(collection(db,'freq'),where('members','array-contains',a)),s=>{{const old=new Set(rq.map(r=>r.id));rq=s.docs.map(d=>({id:d.id,...d.data()}));if(rqReady)rq.filter(r=>r.from!==acc&&!old.has(r.id)).forEach(r=>{const o=r.members.find(x=>x!==acc);pushNote(t('nt_freq').replace('{n}',(users[o]||{}).name||'?'),'',()=>tab('prof'))});rqReady=true}renderFriends()},E));
  getDoc(doc(db,'wallet',a)).then(s=>{if(!s.exists())setDoc(doc(db,'wallet',a),{coins:0,owned:[],eq:{},stk:[]})}).catch(E);
  subs.push(onSnapshot(collection(db,'presence'),s=>{const pv0=pres[acc];pres={};s.docs.forEach(d=>pres[d.id]=d.data());const mine=pres[acc];if(mine&&mine.last&&(!pv0||!pv0.last||pv0.last.toMillis()!==mine.last.toMillis()))skew=mine.last.toMillis()-beatAt;renderRooms();draw()},E),onSnapshot(doc(db,'ach2',a),s=>{siteDone=s.exists()?(s.data().done||{}):{};siteLoaded=true;renderAchTab()},E));beat(false);
  buildShop();subs.push(onSnapshot(doc(db,'cstats',a),s=>{cst=s.exists()?s.data():null;if(cst&&cst.games>0)unlockSite('s_game');renderGame()},E),onSnapshot(collection(db,'achs'),s=>{achs=s.docs.map(d=>({id:d.id,...d.data()}));renderAch();renderGame()},E));resumeGame(a);if(role==='owner'){buildOwn();buildAchCard();subs.push(onSnapshot(collection(db,'promos'),s=>{promos=s.docs.map(d=>({id:d.id,...d.data()}));renderOwn()},E))}
