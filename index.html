@@ -111,8 +111,8 @@ input[type=date]{font:inherit;color:inherit;background:var(--pan);border:1px sol
 .sdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 4px;vertical-align:middle}.sdot.on{background:#22c55e}.sdot.off{background:#9ca3af}.stat{font-size:12px;opacity:.9;display:block}
 #msgs{position:relative}#msgs::before{content:'';margin-top:auto}#cmain{position:relative}
 #tobot{position:absolute;right:14px;bottom:84px;z-index:4;min-width:44px;height:44px;border-radius:22px;opacity:.55;font-size:18px;padding:0 10px}#tobot:hover,#tobot:active{opacity:.95}
-#cpanel{position:fixed;z-index:80;background:var(--bg);box-shadow:0 0 24px #0006;display:flex;flex-direction:column;transition:transform .25s;width:min(360px,92vw);top:0;bottom:0;overflow:hidden}
-#cpanel.pr{right:0;transform:translateX(105%)}#cpanel.pl{left:0;transform:translateX(-105%)}#cpanel.pb{left:0;right:0;width:auto;top:auto;height:min(72vh,540px);bottom:0;transform:translateY(105%)}#cpanel.on{transform:none}
+#cpanel{position:fixed;z-index:80;background:var(--bg);box-shadow:0 0 24px #0006;display:flex;flex-direction:column;width:min(360px,92vw);top:0;bottom:0;overflow:hidden;right:0;transform:translateX(105%);visibility:hidden;pointer-events:none;transition:transform .25s,visibility 0s .25s}
+#cpanel.pr{right:0;transform:translateX(105%)}#cpanel.pl{left:0;transform:translateX(-105%)}#cpanel.pb{left:0;right:0;width:auto;top:auto;height:min(72vh,540px);bottom:0;transform:translateY(105%)}#cpanel.on{transform:none;visibility:visible;pointer-events:auto;transition:transform .25s,visibility 0s}
 .ctop{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bd)}.ctop b{flex:1}
 .cgrid{flex:1;overflow:auto;display:flex;flex-wrap:wrap;gap:14px;align-content:center;justify-content:center;padding:12px}
 .ctile{width:130px;text-align:center}.ctile.gray{opacity:.4;filter:grayscale(1)}.ctile video{width:100%;border-radius:12px;background:#000;max-height:150px;display:block}.ctile .cn{margin-top:6px;font-size:14px;word-break:break-word}
@@ -956,7 +956,7 @@ async function handleIncomingPeer(ds){if(!call)return;const d=ds.data();let P=ca
   P.setup=(async()=>{await P.pc.setRemoteDescription(JSON.parse(d.offer));const ans=await P.pc.createAnswer();await P.pc.setLocalDescription(ans);await updateDoc(ds.ref,{answer:JSON.stringify(ans)})})().catch(e=>console.error(e))}
  if(P.setup){await P.setup;await addCands(P,d.ca||[])}}
 function closePeer(u){const P=call&&call.pcs[u];if(!P)return;try{P.pc.close()}catch(e){}if(P.el){P.el.srcObject=null}delete call.pcs[u]}
-function cleanupLocal(){if(!call)return;const c=call;call=null;clearTimeout(c.timer);c.subs.forEach(f=>{try{f()}catch(e){}});Object.values(c.pcs).forEach(P=>{try{P.pc.close()}catch(e){}});c.local.getTracks().forEach(tk=>tk.stop());if(c.camTrack)c.camTrack.stop();try{c.ctx.close()}catch(e){}$('cpanel').className='';$('cpanel').innerHTML='';if(cur)renderHead()}
+function cleanupLocal(){try{$('cpanel').className=''}catch(e){}if(!call)return;const c=call;call=null;clearTimeout(c.timer);c.subs.forEach(f=>{try{f()}catch(e){}});Object.values(c.pcs).forEach(P=>{try{P.pc.close()}catch(e){}});c.local.getTracks().forEach(tk=>tk.stop());if(c.camTrack)c.camTrack.stop();try{c.ctx.close()}catch(e){}$('cpanel').className='';$('cpanel').innerHTML='';if(cur)renderHead()}
 function endCallLocal(){const rid=call&&call.rid;cleanupLocal();if(rid)cleanOldPeers(rid)}
 async function leaveCall(){if(!call)return;const rid=call.rid,c=callsDoc[rid],left=((c&&c.members)||[]).filter(x=>x!==acc);cleanupLocal();
  try{if(!left.length)await deleteDoc(doc(db,'calls',rid));else await updateDoc(doc(db,'calls',rid),{members:arrayRemove(acc)})}catch(e){}cleanOldPeers(rid)}
